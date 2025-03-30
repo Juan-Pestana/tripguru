@@ -1,0 +1,309 @@
+{
+  "id": "ea58cb6e-d277-474f-9ede-b6bc50051b3f",
+  "prevId": "f6557d34-d33a-486a-9109-fd0d14af4c15",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.es_info": {
+      "name": "es_info",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "eess_id": {
+          "name": "eess_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CP": {
+          "name": "CP",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion": {
+          "name": "direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "horario": {
+          "name": "horario",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "localidad": {
+          "name": "localidad",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provincia": {
+          "name": "provincia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "municipio": {
+          "name": "municipio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idmunicipio": {
+          "name": "idmunicipio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idprovincia": {
+          "name": "idprovincia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idccaa": {
+          "name": "idccaa",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "biodiesel": {
+          "name": "biodiesel",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bioetanol": {
+          "name": "bioetanol",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remision": {
+          "name": "remision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gas_natural_comprimido": {
+          "name": "gas_natural_comprimido",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gas_natural_licuado": {
+          "name": "gas_natural_licuado",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "glp": {
+          "name": "glp",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasoleo_A": {
+          "name": "gasoleo_A",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasoleo_B": {
+          "name": "gasoleo_B",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasoleo_Premium": {
+          "name": "gasoleo_Premium",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_95_E10": {
+          "name": "gasolina_95_E10",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_95_E5": {
+          "name": "gasolina_95_E5",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_95_E5_premium": {
+          "name": "gasolina_95_E5_premium",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_98_E10": {
+          "name": "gasolina_98_E10",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_98_E5": {
+          "name": "gasolina_98_E5",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hidrogeno": {
+          "name": "hidrogeno",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_esinfo_ideess": {
+          "name": "idx_esinfo_ideess",
+          "columns": [
+            {
+              "expression": "eess_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "es_info_eess_id_locations_external_id_fk": {
+          "name": "es_info_eess_id_locations_external_id_fk",
+          "tableFrom": "es_info",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "eess_id"
+          ],
+          "columnsTo": [
+            "external_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "esinfo_eess_id_unique": {
+          "name": "esinfo_eess_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "eess_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.locations": {
+      "name": "locations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unknown'"
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'service_station'"
+        },
+        "location": {
+          "name": "location",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "spatial_index": {
+          "name": "spatial_index",
+          "columns": [
+            {
+              "expression": "location",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "locations_external_id_unique": {
+          "name": "locations_external_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "external_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
