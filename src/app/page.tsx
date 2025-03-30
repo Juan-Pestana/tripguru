@@ -1,7 +1,7 @@
 "use client";
 
 // pages/index.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,12 +55,14 @@ export default function Home() {
 	const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(
 		null,
 	);
+	const [fuelType, setFuelType] = useState<string>("gasoleo_a");
 	const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
 	const [route, setRoute] = useState<RouteData | null>(null);
 	const [serviceStations, setServiceStations] = useState<POI[]>([]);
 	const [filteredStations, setFilteredStations] = useState<POI[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [showRightSideOnly, setShowRightSideOnly] = useState<boolean>(true);
+	const [selectedStation, setSelectedStation] = useState<string | null>(null);
 
 	// Function to get current location
 	const getCurrentLocation = () => {
@@ -147,6 +149,7 @@ export default function Home() {
 				try {
 					const pois = await getPOIsFromDatabase(
 						decodedCoordinates,
+						fuelType,
 						200, // radius in meters
 					);
 
@@ -191,7 +194,9 @@ export default function Home() {
 		}
 	}, [showRightSideOnly, serviceStations]);
 
-	//console.log("this is filtered stations", filteredStations);
+	const onStationClick = (stationId: string) => {
+		setSelectedStation(stationId);
+	};
 
 	return (
 		<div className="flex flex-col md:flex-row h-screen">
@@ -225,18 +230,20 @@ export default function Home() {
 								value={destination}
 								onChange={(e) => setDestination(e.target.value)}
 							/>
-							<Select>
+							<Select onValueChange={(value) => setFuelType(value)}>
 								<SelectTrigger className="w-[180px]">
 									<SelectValue placeholder="Select fuel" />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectGroup>
 										<SelectLabel>Fuels</SelectLabel>
-										<SelectItem value="apple">Diesel</SelectItem>
-										<SelectItem value="banana">Diesel Prem</SelectItem>
-										<SelectItem value="blueberry">Gasolina 95</SelectItem>
-										<SelectItem value="grapes">Gasolina 98</SelectItem>
-										<SelectItem value="pineapple">GLP</SelectItem>
+										<SelectItem value="gasoleo_a">Diesel</SelectItem>
+										<SelectItem value="gasoleo_premium">Diesel Prem</SelectItem>
+										<SelectItem value="gasolina_95_e5">Gasolina 95</SelectItem>
+										<SelectItem value="gasolina_95_e5_premium">
+											Gasolina 98
+										</SelectItem>
+										<SelectItem value="glp">GLP</SelectItem>
 									</SelectGroup>
 								</SelectContent>
 							</Select>
@@ -274,7 +281,11 @@ export default function Home() {
 								</h3>
 								<div className="h-full overflow-y-auto">
 									{filteredStations.map((station) => (
-										<ServiceStationCard key={station.id} station={station} />
+										<ServiceStationCard
+											key={station.id}
+											station={station}
+											onClick={() => onStationClick(station.id)}
+										/>
 									))}
 								</div>
 							</div>
@@ -309,6 +320,7 @@ export default function Home() {
 					route={route?.coordinates}
 					stations={filteredStations}
 					showRightSideOnly={showRightSideOnly}
+					selectedStation={selectedStation}
 				/>
 			</div>
 		</div>
