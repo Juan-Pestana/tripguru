@@ -43,3 +43,5 @@ yarn-error.log*
 next-env.d.ts
 
 /src/lib/gasolineras.js
+/src/lib/charge_stations.json
+/src/lib/test.ts
