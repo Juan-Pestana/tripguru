@@ -9,12 +9,8 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Navigation } from "lucide-react";
 import polyline from "@mapbox/polyline";
 import { getRoute } from "@/actions/getRoute";
-import { getPOIsFromDatabase, type POI } from "@/actions/getPOIs";
-import {
-	calculateDistance,
-	isStationOnRightSide,
-	reverseGeocode,
-} from "@/lib/utils";
+
+import { isStationOnRightSide, reverseGeocode } from "@/lib/utils";
 import { ServiceStationCard } from "@/components/service-station-card";
 import {
 	Select,
@@ -25,6 +21,12 @@ import {
 	SelectGroup,
 	SelectLabel,
 } from "@/components/ui/select";
+import {
+	getAllPOIs,
+	getEVChargingPoints,
+	getServiceStations,
+	type POI,
+} from "@/actions/getPois2";
 
 // Types for our application
 interface Coordinates {
@@ -37,6 +39,22 @@ interface RouteData {
 	distance: number;
 	duration: number;
 }
+
+type POIType = "service_station" | "ev_charging_point" | "both";
+
+const FUEL_TYPES = {
+	gasoleo_a: "Diesel",
+	gasoleo_premium: "Diesel Premium",
+	gasolina_95_e5: "Gasolina 95",
+	gasolina_95_e5_premium: "Gasolina 98",
+	glp: "GLP",
+} as const;
+
+const CONNECTION_TYPES = {
+	type2: "Type 2 (Socket Only)",
+	ccs: "CCS (Type 2)",
+	chademo: "CHAdeMO",
+} as const;
 
 // Dynamically import the Map component to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("../components/MapComponent"), {
@@ -63,6 +81,12 @@ export default function Home() {
 	const [error, setError] = useState<string | null>(null);
 	const [showRightSideOnly, setShowRightSideOnly] = useState<boolean>(true);
 	const [selectedStation, setSelectedStation] = useState<string | null>(null);
+	const [poiType, setPoiType] = useState<POIType>("service_station");
+	const [selectedPOITypes, setSelectedPOITypes] = useState<Set<POIType>>(
+		new Set(["service_station"]),
+	);
+
+	const [connectionType, setConnectionType] = useState<string>("ccs");
 
 	// Function to get current location
 	const getCurrentLocation = () => {
@@ -147,11 +171,28 @@ export default function Home() {
 
 			async function findPOIsAlongPolyline() {
 				try {
-					const pois = await getPOIsFromDatabase(
-						decodedCoordinates,
-						fuelType,
-						200, // radius in meters
-					);
+					console.log(connectionType);
+					let pois: POI[] = [];
+
+					if (selectedPOITypes.size === 2) {
+						// Both types selected
+						pois = await getAllPOIs(
+							decodedCoordinates,
+							fuelType,
+							connectionType,
+							200,
+						);
+					} else if (selectedPOITypes.has("service_station")) {
+						// Only service stations
+						pois = await getServiceStations(decodedCoordinates, fuelType, 200);
+					} else if (selectedPOITypes.has("ev_charging_point")) {
+						// Only EV charging points
+						pois = await getEVChargingPoints(
+							decodedCoordinates,
+							connectionType,
+							200,
+						);
+					}
 
 					const processedStations = pois.map((station: POI) => {
 						const isRight = isStationOnRightSide(
@@ -194,6 +235,8 @@ export default function Home() {
 		}
 	}, [showRightSideOnly, serviceStations]);
 
+	console.log("Filtered stations:", filteredStations);
+
 	const onStationClick = (stationId: string) => {
 		setSelectedStation(stationId);
 	};
@@ -230,23 +273,116 @@ export default function Home() {
 								value={destination}
 								onChange={(e) => setDestination(e.target.value)}
 							/>
-							<Select onValueChange={(value) => setFuelType(value)}>
-								<SelectTrigger className="w-[180px]">
-									<SelectValue placeholder="Select fuel" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectGroup>
-										<SelectLabel>Fuels</SelectLabel>
-										<SelectItem value="gasoleo_a">Diesel</SelectItem>
-										<SelectItem value="gasoleo_premium">Diesel Prem</SelectItem>
-										<SelectItem value="gasolina_95_e5">Gasolina 95</SelectItem>
-										<SelectItem value="gasolina_95_e5_premium">
-											Gasolina 98
-										</SelectItem>
-										<SelectItem value="glp">GLP</SelectItem>
-									</SelectGroup>
-								</SelectContent>
-							</Select>
+						</div>
+
+						<div className="space-y-2">
+							<label
+								htmlFor="poi-service-station"
+								className="text-sm font-medium"
+							>
+								Search for:
+							</label>
+							<div className="flex space-x-2">
+								<div className="flex items-center space-x-2">
+									<input
+										type="checkbox"
+										id="poi-service-station"
+										checked={selectedPOITypes.has("service_station")}
+										onChange={(e) => {
+											const newSelected = new Set(selectedPOITypes);
+											if (e.target.checked) {
+												newSelected.add("service_station");
+											} else {
+												newSelected.delete("service_station");
+											}
+											setSelectedPOITypes(newSelected);
+										}}
+										className="h-4 w-4 rounded border-gray-300"
+									/>
+									<label htmlFor="poi-service-station" className="text-sm">
+										Service Stations
+									</label>
+								</div>
+
+								<div className="flex items-center space-x-2">
+									<input
+										type="checkbox"
+										id="poi-ev-charging"
+										checked={selectedPOITypes.has("ev_charging_point")}
+										onChange={(e) => {
+											const newSelected = new Set(selectedPOITypes);
+											if (e.target.checked) {
+												newSelected.add("ev_charging_point");
+											} else {
+												newSelected.delete("ev_charging_point");
+											}
+											setSelectedPOITypes(newSelected);
+										}}
+										className="h-4 w-4 rounded border-gray-300"
+									/>
+									<label htmlFor="poi-ev-charging" className="text-sm">
+										EV Charging Points
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div className="flex items-center space-x-2">
+							{/* Conditional Fuel/Connection Type Selection */}
+							{selectedPOITypes.has("service_station") && (
+								<div className="space-y-2">
+									<label
+										htmlFor="fuel-type-select"
+										className="text-sm font-medium"
+									>
+										Fuel Type:
+									</label>
+									<Select onValueChange={(value) => setFuelType(value)}>
+										<SelectTrigger id="fuel-type-select" className="w-full">
+											<SelectValue placeholder="Select fuel type" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectGroup>
+												{Object.entries(FUEL_TYPES).map(([value, label]) => (
+													<SelectItem key={value} value={value}>
+														{label}
+													</SelectItem>
+												))}
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+								</div>
+							)}
+
+							{selectedPOITypes.has("ev_charging_point") && (
+								<div className="space-y-2">
+									<label
+										htmlFor="connection-type-select"
+										className="text-sm font-medium"
+									>
+										Connection Type:
+									</label>
+									<Select onValueChange={(value) => setConnectionType(value)}>
+										<SelectTrigger
+											id="connection-type-select"
+											className="w-full"
+										>
+											<SelectValue placeholder="Select connection type" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectGroup>
+												{Object.entries(CONNECTION_TYPES).map(
+													([label, value]) => (
+														<SelectItem key={value} value={value}>
+															{label}
+														</SelectItem>
+													),
+												)}
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+								</div>
+							)}
 						</div>
 
 						<div className="flex items-center space-x-2">

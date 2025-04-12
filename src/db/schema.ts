@@ -7,8 +7,8 @@ import {
 	text,
 	timestamp,
 	unique,
-	decimal,
 	numeric,
+	boolean,
 } from "drizzle-orm/pg-core";
 
 export const locations = pgTable(
@@ -32,15 +32,23 @@ export const locations = pgTable(
 	],
 );
 
+// Relations
 export const locationRelations = relations(locations, ({ one }) => ({
-	esInfo: one(es_info),
+	esInfo: one(es_info, {
+		fields: [locations.external_id],
+		references: [es_info.location_id],
+	}),
+	evDetails: one(ev_details, {
+		fields: [locations.external_id],
+		references: [ev_details.location_id],
+	}),
 }));
 
 export const es_info = pgTable(
 	"es_info",
 	{
 		id: serial("id").primaryKey(),
-		eess_id: text("eess_id")
+		location_id: text("location_id")
 			.notNull()
 			.references(() => locations.external_id),
 		cp: text("cp"),
@@ -70,14 +78,56 @@ export const es_info = pgTable(
 	},
 	(t) => [
 		// Add index on the foreign key
-		unique("esinfo_eess_id_unique").on(t.eess_id),
-		index("idx_esinfo_ideess").on(t.eess_id),
+		unique("esinfo_eess_id_unique").on(t.location_id),
+		index("idx_esinfo_ideess").on(t.location_id),
 	],
 );
 
+// For EV charging points
+export const ev_details = pgTable(
+	"ev_details",
+	{
+		id: serial("id").primaryKey(),
+		location_id: text("location_id")
+			.notNull()
+			.references(() => locations.external_id),
+		operator: text("operator"),
+		usage_cost: text("usage_cost"),
+		address: text("address"),
+		city: text("city"),
+		access_type: text("access_type"),
+		is_operational: boolean("is_operational").default(true),
+		total_points: numeric("total_points"),
+		phone_number: text("phone_number"),
+		last_verified: timestamp("last_verified"),
+	},
+	(t) => [
+		// Add unique constraint
+		unique("ev_details_location_id_unique").on(t.location_id),
+	],
+);
+
+export const connection_types = pgTable("connection_types", {
+	id: serial("id").primaryKey(),
+	location_id: text("location_id")
+		.notNull()
+		.references(() => locations.external_id),
+	connection_type: text("connection_type").notNull(),
+	power_kw: numeric("power_kw"),
+	quantity: numeric("quantity"),
+	current_type: text("current_type"),
+});
+
 export const esInfoRelations = relations(es_info, ({ one }) => ({
 	location: one(locations, {
-		fields: [es_info.eess_id],
+		fields: [es_info.location_id],
+		references: [locations.external_id],
+	}),
+}));
+
+export const evInfoRelations = relations(ev_details, ({ one }) => ({
+	location: one(locations, {
+		fields: [ev_details.location_id],
 		references: [locations.external_id],
 	}),
 }));

@@ -1,0 +1,466 @@
+{
+  "id": "1071309a-14b0-4846-897b-5af291c18832",
+  "prevId": "ad4d405c-f917-40ce-a111-2a0df89e667e",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.connection_types": {
+      "name": "connection_types",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "connection_type": {
+          "name": "connection_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "power_kw": {
+          "name": "power_kw",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_type": {
+          "name": "current_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "connection_types_location_id_locations_external_id_fk": {
+          "name": "connection_types_location_id_locations_external_id_fk",
+          "tableFrom": "connection_types",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "external_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.es_info": {
+      "name": "es_info",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cp": {
+          "name": "cp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion": {
+          "name": "direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "horario": {
+          "name": "horario",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "localidad": {
+          "name": "localidad",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provincia": {
+          "name": "provincia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "municipio": {
+          "name": "municipio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idmunicipio": {
+          "name": "idmunicipio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idprovincia": {
+          "name": "idprovincia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "idccaa": {
+          "name": "idccaa",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "biodiesel": {
+          "name": "biodiesel",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bioetanol": {
+          "name": "bioetanol",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remision": {
+          "name": "remision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gas_natural_comprimido": {
+          "name": "gas_natural_comprimido",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gas_natural_licuado": {
+          "name": "gas_natural_licuado",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "glp": {
+          "name": "glp",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasoleo_a": {
+          "name": "gasoleo_a",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasoleo_b": {
+          "name": "gasoleo_b",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasoleo_premium": {
+          "name": "gasoleo_premium",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_95_e10": {
+          "name": "gasolina_95_e10",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_95_e5": {
+          "name": "gasolina_95_e5",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_95_e5_premium": {
+          "name": "gasolina_95_e5_premium",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_98_e10": {
+          "name": "gasolina_98_e10",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gasolina_98_e5": {
+          "name": "gasolina_98_e5",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hidrogeno": {
+          "name": "hidrogeno",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_esinfo_ideess": {
+          "name": "idx_esinfo_ideess",
+          "columns": [
+            {
+              "expression": "location_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "es_info_location_id_locations_external_id_fk": {
+          "name": "es_info_location_id_locations_external_id_fk",
+          "tableFrom": "es_info",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "external_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "esinfo_eess_id_unique": {
+          "name": "esinfo_eess_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "location_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ev_details": {
+      "name": "ev_details",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "operator": {
+          "name": "operator",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usage_cost": {
+          "name": "usage_cost",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_type": {
+          "name": "access_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_operational": {
+          "name": "is_operational",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "total_points": {
+          "name": "total_points",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_verified": {
+          "name": "last_verified",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ev_details_location_id_locations_external_id_fk": {
+          "name": "ev_details_location_id_locations_external_id_fk",
+          "tableFrom": "ev_details",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "external_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.locations": {
+      "name": "locations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unknown'"
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'service_station'"
+        },
+        "location": {
+          "name": "location",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "spatial_index": {
+          "name": "spatial_index",
+          "columns": [
+            {
+              "expression": "location",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "locations_external_id_unique": {
+          "name": "locations_external_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "external_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
