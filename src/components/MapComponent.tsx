@@ -6,6 +6,7 @@ import { useMap } from "react-leaflet";
 import dynamic from "next/dynamic";
 import L, { map } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import ServiceStationPopup from "./station-popup";
 
 // Dynamically import Leaflet components with no SSR
 const MapContainer = dynamic(
@@ -101,6 +102,20 @@ const MapBoundsAdjuster: React.FC<{
 	return null;
 };
 
+const sampleStation = {
+	name: "Shell Gas Station",
+	address: "123 Main Street",
+	city: "Toronto",
+	province: "ON",
+	postalCode: "M5V 2K7",
+	openingHours: "Open 24 hours",
+	gasPrice: 1.89,
+	rating: 4.2,
+	bestCategories: ["Clean Restrooms", "Fast Service"],
+	onRateClick: () => {},
+	onNavigateClick: () => {},
+};
+
 const MapComponent: React.FC<MapComponentProps> = ({
 	route,
 	stations,
@@ -122,6 +137,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 		if (selectedStation && markers[selectedStation] && mapRef.current) {
 			const marker = markers[selectedStation];
 			const position = marker?.getLatLng();
+			//fetch station details here if needed
 			if (position) {
 				mapRef.current.flyTo(position, 15);
 				marker?.openPopup();
@@ -172,12 +188,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
 						}
 					}}
 				>
-					<Popup>
-						<div>
-							<h3 className="font-bold">{station.name}</h3>
-							<p>Distance from route: {station.distance.toFixed(1)} m</p>
-							<p>Side of road: {station.side === "right" ? "Right" : "Left"}</p>
-						</div>
+					<Popup className="w-96">
+						<ServiceStationPopup station={sampleStation} />
 					</Popup>
 				</Marker>
 			))}

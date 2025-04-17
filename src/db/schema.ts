@@ -10,6 +10,7 @@ import {
 	numeric,
 	boolean,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const locations = pgTable(
 	"locations",
@@ -27,7 +28,9 @@ export const locations = pgTable(
 		updated_at: timestamp("updated_at").notNull().defaultNow(),
 	},
 	(t) => [
-		index("spatial_index").using("gist", t.location),
+		// 🛠 GIST index on geometry using raw SQL
+		//customIndex("idx_location_gist").on(sql`USING gist ("location")`),
+		index("idx_location_type").on(t.type),
 		unique("locations_external_id_unique").on(t.external_id),
 	],
 );
@@ -77,9 +80,13 @@ export const es_info = pgTable(
 		hidrogeno: numeric("hidrogeno"),
 	},
 	(t) => [
-		// Add index on the foreign key
 		unique("esinfo_eess_id_unique").on(t.location_id),
-		index("idx_esinfo_ideess").on(t.location_id),
+		// Add indexes for commonly queried fuel types
+		index("idx_gasoleo_a").on(t.gasoleo_a),
+		index("idx_gasoleo_premium").on(t.gasoleo_premium),
+		index("idx_gasolina_95_e5").on(t.gasolina_95_e5),
+		index("idx_gasolina_98_e5").on(t.gasolina_98_e5),
+		index("idx_glp").on(t.glp),
 	],
 );
 
@@ -107,16 +114,25 @@ export const ev_details = pgTable(
 	],
 );
 
-export const connection_types = pgTable("connection_types", {
-	id: serial("id").primaryKey(),
-	location_id: text("location_id")
-		.notNull()
-		.references(() => locations.external_id),
-	connection_type: text("connection_type").notNull(),
-	power_kw: numeric("power_kw"),
-	quantity: numeric("quantity"),
-	current_type: text("current_type"),
-});
+export const connection_types = pgTable(
+	"connection_types",
+	{
+		id: serial("id").primaryKey(),
+		location_id: text("location_id")
+			.notNull()
+			.references(() => locations.external_id),
+		connection_type: text("connection_type").notNull(),
+		power_kw: numeric("power_kw"),
+		quantity: numeric("quantity"),
+		current_type: text("current_type"),
+	},
+	(t) => [
+		// Add index for connection type queries
+		index("idx_connection_type").on(t.connection_type),
+		// Add composite index for location and connection type
+		index("idx_location_connection").on(t.location_id, t.connection_type),
+	],
+);
 
 export const esInfoRelations = relations(es_info, ({ one }) => ({
 	location: one(locations, {

@@ -14,7 +14,6 @@ import { useRoute } from "@/hooks/useRoute";
 import { usePOIs } from "@/hooks/usePOIs";
 import { type Coordinates, type POIType, RouteData } from "@/types/types";
 import { reverseGeocode } from "@/lib/utils";
-import MapContainer from "@/components/MapContainer";
 
 // Dynamically import the Map component to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/MapComponent"), {
@@ -90,6 +89,7 @@ export default function Home() {
 			setError("Geolocation is not supported by your browser.");
 			setIsLoadingLocation(false);
 		}
+		// ... existing getCurrentLocation logic ...
 	};
 
 	// Search handling
@@ -168,12 +168,14 @@ export default function Home() {
 				</CardContent>
 			</Card>
 
-			<MapContainer
-				route={route?.coordinates}
-				stations={filteredPois}
-				showRightSideOnly={showRightSideOnly}
-				selectedStation={selectedPOI}
-			/>
+			<div className="w-full md:w-2/3 h-64 md:h-full">
+				<MapComponent
+					route={route?.coordinates}
+					stations={filteredPois}
+					showRightSideOnly={showRightSideOnly}
+					selectedStation={selectedPOI}
+				/>
+			</div>
 		</div>
 	);
 }

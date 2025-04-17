@@ -50,6 +50,20 @@
       "when": 1744148728600,
       "tag": "0006_glamorous_silver_samurai",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1744530979266,
+      "tag": "0010_location-index",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1744531301617,
+      "tag": "0008_bumpy_spectrum",
+      "breakpoints": true
     }
   ]
 }

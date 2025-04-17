@@ -40,11 +40,11 @@ import { eess } from "@/lib/gasolineras";
 //   }]
 
 function parsePrice(price: string): number | null {
-	if (!price || price.trim() === '') return null;
-	const value = Number(price.replace(',', '.'));
+	if (!price || price.trim() === "") return null;
+	const value = Number(price.replace(",", "."));
 
-	return value
-  }
+	return value;
+}
 
 async function seed() {
 	try {
@@ -114,6 +114,3 @@ async function seed() {
 }
 
 seed();
-
-
-
