@@ -7,6 +7,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { getChargingTypeIcon } from "@/lib/componentUtils";
 
 interface POITypeSelectorProps {
 	selectedTypes: Set<POIType>;
@@ -149,7 +150,7 @@ function ConnectionTypeSelect({
 				Connection Type:
 			</label>
 			<Select value={value} onValueChange={onChange}>
-				<SelectTrigger id="connection-type-select" className="w-full">
+				<SelectTrigger id="connection-type-select" className="w-[200px]">
 					<SelectValue placeholder="Select connection type" />
 				</SelectTrigger>
 				<SelectContent>

@@ -19,7 +19,7 @@ export function usePOIs() {
 	const [filteredPois, setFilteredPois] = useState<POI[]>([]);
 	const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
 	const [showRightSideOnly, setShowRightSideOnly] = useState(true);
-	const [isLoading, setIsLoading] = useState(false);
+
 	const [error, setError] = useState<string | null>(null);
 
 	const fetchPOIs = async (
@@ -29,7 +29,6 @@ export function usePOIs() {
 		const { selectedTypes, fuelType, connectionType, radius = 200 } = options;
 
 		try {
-			setIsLoading(true);
 			setError(null);
 			let fetchedPois: POI[] = [];
 
@@ -78,8 +77,6 @@ export function usePOIs() {
 		} catch (err) {
 			console.error("Error fetching POIs:", err);
 			setError("Failed to fetch points of interest");
-		} finally {
-			setIsLoading(false);
 		}
 	};
 
@@ -96,7 +93,7 @@ export function usePOIs() {
 		filteredPois,
 		selectedPOI,
 		showRightSideOnly,
-		isLoading,
+
 		error,
 		setShowRightSideOnly: updateFilter,
 		setSelectedPOI,

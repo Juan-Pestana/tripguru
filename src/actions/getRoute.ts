@@ -57,6 +57,8 @@ export const getRoute = async ({
 
 	//console.log("this is routeData", await routeResponse.json());
 	const routeData = await routeResponse.json();
+
+	console.log(routeData);
 	//console.log("this is routeData", routeData);
 	return routeData;
 };

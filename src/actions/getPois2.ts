@@ -12,6 +12,7 @@ type EsInfo = InferSelectModel<typeof es_info>;
 interface BasePOI {
 	id: string;
 	name: string;
+	location_id: string;
 	coordinates: [number, number];
 	distance: number;
 	distanceAlongRoute: number;
@@ -57,6 +58,7 @@ export async function getServiceStations(
       SELECT 
         l.id,
         l.name,
+        l.external_id,
         ST_X(l.location::geometry) as longitude,
         ST_Y(l.location::geometry) as latitude,
         ST_LineLocatePoint(route.geom, l.location::geometry) * 
@@ -77,6 +79,7 @@ export async function getServiceStations(
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		(poi: any) => ({
 			id: poi.id.toString(),
+			location_id: poi.external_id,
 			name: poi.name,
 			type: "service_station" as const,
 			coordinates: [poi.latitude, poi.longitude],
@@ -104,6 +107,7 @@ export async function getEVChargingPoints(
             )
             SELECT 
               l.id,
+              l.external_id,
               l.name,
               ST_X(l.location::geometry) as longitude,
               ST_Y(l.location::geometry) as latitude,
@@ -145,6 +149,7 @@ export async function getEVChargingPoints(
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		(poi: any) => ({
 			id: poi.id.toString(),
+			location_id: poi.external_id,
 			name: poi.name,
 			type: "ev_charging_point" as const,
 			coordinates: [poi.latitude, poi.longitude],
@@ -180,6 +185,7 @@ export async function getAllPOIs(
       service_stations AS (
         SELECT 
           l.id,
+          l.external_id,
           l.name,
           l.type,
           ST_X(l.location::geometry) as longitude,
@@ -200,6 +206,7 @@ export async function getAllPOIs(
       ev_points AS (
   SELECT 
     l.id,
+    l.external_id,
     l.name,
     l.type,
     ST_X(l.location::geometry) as longitude,
@@ -249,6 +256,7 @@ export async function getAllPOIs(
 		(poi: any) => {
 			const base = {
 				id: poi.id.toString(),
+				location_id: poi.external_id,
 				name: poi.name,
 				coordinates: [poi.latitude, poi.longitude] as [number, number],
 				distance: Math.round(poi.distance_from_route),

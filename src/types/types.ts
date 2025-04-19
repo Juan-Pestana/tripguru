@@ -55,9 +55,9 @@ export const FUEL_TYPES = {
 } as const;
 
 export const CONNECTION_TYPES = {
-	type2: "Type 2 (Socket Only)",
-	ccs: "CCS (Type 2)",
-	chademo: "CHAdeMO",
+	"Type 2": "Type 2 (Socket Only)",
+	CCS: "CCS (Type 2)",
+	CHAdeMO: "CHAdeMO",
 } as const;
 
 // Define the return type from your tables
@@ -67,6 +67,7 @@ export const CONNECTION_TYPES = {
 // Base types for all POIs
 interface BasePOI {
 	id: string;
+	location_id: string;
 	name: string;
 	coordinates: [number, number];
 	distance: number;

@@ -41,16 +41,15 @@ export default function Home() {
 		new Set(["service_station"]),
 	);
 	const [fuelType, setFuelType] = useState("gasoleo_a");
-	const [connectionType, setConnectionType] = useState("ccs");
+	const [connectionType, setConnectionType] = useState("CCS (Type 2)");
+	const [isLoading, setIsLoading] = useState(false);
 
 	// Route and POIs state managed by custom hooks
 	const { route, fetchRoute, error: routeError } = useRoute();
 	const {
-		pois,
 		filteredPois,
 		selectedPOI,
 		showRightSideOnly,
-		isLoading,
 		error: poisError,
 		setShowRightSideOnly,
 		setSelectedPOI,
@@ -96,6 +95,8 @@ export default function Home() {
 	const handleSearch = async () => {
 		if ((!origin && !currentLocation) || !destination) return;
 
+		setIsLoading(true);
+
 		const routeResult = await fetchRoute({
 			origin,
 			destination,
@@ -109,6 +110,7 @@ export default function Home() {
 				selectedTypes: selectedPOITypes,
 			});
 		}
+		setIsLoading(false);
 	};
 
 	return (
