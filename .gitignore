@@ -45,5 +45,5 @@ next-env.d.ts
 /src/lib/gasolineras.js
 /src/lib/charge_stations.json
 /src/lib/test.ts
-/src/lib/seed.ts
-/src/lib/seedev.ts
+/src/lib/seedes.ts
+/src/lib/seedevpoi.ts
