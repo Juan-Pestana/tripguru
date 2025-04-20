@@ -45,5 +45,5 @@ export function useRoute() {
 		}
 	};
 
-	return { route, error, fetchRoute };
+	return { route, error, fetchRoute, setRoute };
 }

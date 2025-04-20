@@ -67,15 +67,15 @@ export async function getStationDetails(
 				SELECT 
 				  rs.avg_rating,
 				  rs.total_ratings,
-				  COALESCE(
-					jsonb_agg(
+				  CASE 
+					WHEN COUNT(cc.category) = 0 THEN NULL
+					ELSE jsonb_agg(
 					  jsonb_build_object(
 						'category', cc.category,
 						'count', cc.count
 					  )
-					),
-					'[]'::jsonb
-				  ) as top_categories
+					)::text
+				  END as top_categories
 				FROM rating_stats rs
 				LEFT JOIN category_counts cc ON true
 				GROUP BY rs.avg_rating, rs.total_ratings
@@ -102,11 +102,9 @@ export async function getStationDetails(
 			total_ratings: ratingData?.total_ratings
 				? Number.parseInt(ratingData.total_ratings, 10)
 				: 0,
-			top_categories: Array.isArray(rating.rows[0]?.top_categories)
-				? rating.rows[0]?.top_categories
-				: typeof rating.rows[0]?.top_categories === "string"
-					? JSON.parse(rating.rows[0]?.top_categories || "[]")
-					: rating.rows[0]?.top_categories || [],
+			top_categories: ratingData?.top_categories
+				? JSON.parse(ratingData.top_categories)
+				: null,
 		};
 	} catch (error) {
 		console.error("Error fetching station details:", error);

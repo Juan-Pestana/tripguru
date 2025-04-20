@@ -95,6 +95,7 @@ export function usePOIs() {
 		showRightSideOnly,
 
 		error,
+		setFilteredPois,
 		setShowRightSideOnly: updateFilter,
 		setSelectedPOI,
 		fetchPOIs,

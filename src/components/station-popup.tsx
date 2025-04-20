@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { POI } from "@/types/types";
-import type { EVStationDetails, StationDetails } from "@/actions/getPoyById";
+import type { StationDetails } from "@/actions/getPoyById";
 
 interface ServiceStationPopupProps {
 	station: POI & {
@@ -18,8 +18,7 @@ export default function ServiceStationPopup({
 	station,
 }: ServiceStationPopupProps) {
 	// Get the POI ID from the URL
-
-	console.log("Station details:", station);
+	console.log(station);
 
 	return (
 		<Card className="w-[350px] relative py-2 gap-3 border-0 border-transparent shadow-transparent">
@@ -67,7 +66,7 @@ export default function ServiceStationPopup({
 						)}
 					</div>
 					<div className="flex flex-wrap gap-1">
-						{station.details.top_categories[0].category ? (
+						{station.details.top_categories ? (
 							station.details.top_categories.map((category, index) => (
 								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 								<Badge key={index} variant="secondary" className="text-xs">

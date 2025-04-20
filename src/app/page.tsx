@@ -45,7 +45,7 @@ export default function Home() {
 	const [isLoading, setIsLoading] = useState(false);
 
 	// Route and POIs state managed by custom hooks
-	const { route, fetchRoute, error: routeError } = useRoute();
+	const { route, fetchRoute, error: routeError, setRoute } = useRoute();
 	const {
 		filteredPois,
 		selectedPOI,
@@ -54,6 +54,7 @@ export default function Home() {
 		setShowRightSideOnly,
 		setSelectedPOI,
 		fetchPOIs,
+		setFilteredPois,
 	} = usePOIs();
 
 	// Location handling
@@ -95,7 +96,9 @@ export default function Home() {
 	const handleSearch = async () => {
 		if ((!origin && !currentLocation) || !destination) return;
 		setSelectedPOI(null);
+		setRoute(null);
 		setError(null);
+		setFilteredPois([]);
 
 		setIsLoading(true);
 
