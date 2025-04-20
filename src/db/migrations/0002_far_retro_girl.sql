@@ -1,1 +1,0 @@
-ALTER TABLE "es_info" RENAME COLUMN "CP" TO "cp";

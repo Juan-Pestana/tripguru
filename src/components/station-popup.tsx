@@ -19,6 +19,8 @@ export default function ServiceStationPopup({
 }: ServiceStationPopupProps) {
 	// Get the POI ID from the URL
 
+	console.log("Station details:", station);
+
 	const bestCategories = ["Kids friendly", "Food & drink"];
 
 	return (
@@ -52,30 +54,49 @@ export default function ServiceStationPopup({
 							</span>
 							<span className="text-xs text-muted-foreground">/L</span>
 						</div>
-						<div className="flex items-center">
-							<Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-							<span className="font-medium text-lg">
-								{/* {rating.toFixed(1)} */}5
+						{station.details.rating ? (
+							<div className="flex items-center">
+								<Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
+								<span className="font-medium text-lg">
+									{/* {rating.toFixed(1)} */}5
+								</span>
+								<span className="text-xs text-muted-foreground">/5</span>
+							</div>
+						) : (
+							<span className="text-sm text-muted-foreground">
+								No ratings yet
 							</span>
-							<span className="text-xs text-muted-foreground">/5</span>
-						</div>
+						)}
 					</div>
 					<div className="flex flex-wrap gap-1">
-						{bestCategories.map((category, index) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-							<Badge key={index} variant="secondary" className="text-xs">
-								{category}
+						{station.details.top_categories[0].category ? (
+							station.details.top_categories.map((category, index) => (
+								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								<Badge key={index} variant="secondary" className="text-xs">
+									{category.category}
+								</Badge>
+							))
+						) : (
+							<Badge variant="info" className="text-xs ">
+								Be the first to rate this station!
 							</Badge>
-						))}
+						)}
 					</div>
 				</div>
 			</CardContent>
 
 			<CardFooter className="flex gap-2 p-4 pt-0">
-				<Button variant="outline" size="sm" className="flex-1 text-sm">
-					<ThumbsUp className="h-3.5 w-3.5 mr-1" />
-					Rate Station
-				</Button>
+				<Link href={`/rank/${station.location_id}`} className="flex-1">
+					<Button
+						variant="outline"
+						size="sm"
+						className="w-full text-sm cursor-pointer"
+					>
+						<ThumbsUp className="h-3.5 w-3.5 mr-1" />
+						Rate Station
+					</Button>
+				</Link>
+
 				<Link
 					className="flex-1"
 					target="_blank"

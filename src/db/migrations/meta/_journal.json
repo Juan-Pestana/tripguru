@@ -5,64 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1743357378866,
-      "tag": "0000_faulty_scrambler",
+      "when": 1745157861804,
+      "tag": "0000_enable-postgis",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1743357433887,
-      "tag": "0001_wide_aqueduct",
+      "when": 1745157922299,
+      "tag": "0001_dry_snowbird",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1743357561211,
-      "tag": "0002_far_retro_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1743358645613,
-      "tag": "0003_colorful_mesmero",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1744144633332,
-      "tag": "0004_awesome_sunset_bain",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1744147818642,
-      "tag": "0005_clever_changeling",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1744148728600,
-      "tag": "0006_glamorous_silver_samurai",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1744530979266,
-      "tag": "0010_location-index",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1744531301617,
-      "tag": "0008_bumpy_spectrum",
+      "when": 1745167748859,
+      "tag": "0002_easy_molten_man",
       "breakpoints": true
     }
   ]

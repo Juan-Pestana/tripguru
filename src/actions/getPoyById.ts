@@ -1,7 +1,14 @@
 "use server";
 
 import { db } from "@/db";
-import { es_info, locations, ev_details, connection_types } from "@/db/schema";
+import {
+	es_info,
+	locations,
+	ev_details,
+	connection_types,
+	station_ratings,
+	station_categories,
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 
@@ -13,31 +20,84 @@ export interface StationDetails {
 	postalCode: string;
 	city: string;
 	schedule: string;
+	rating: number | null;
+	total_ratings: number;
+	top_categories: {
+		count: number;
+		category: string;
+	}[];
 }
 
 export async function getStationDetails(
 	locationId: string,
 ): Promise<StationDetails | null> {
 	try {
-		const result = await db.query.locations.findFirst({
-			where: eq(locations.external_id, locationId),
-			with: {
-				esInfo: true,
-			},
-		});
+		const [details, rating] = await Promise.all([
+			db.query.locations.findFirst({
+				where: eq(locations.external_id, locationId),
+				with: {
+					esInfo: true,
+				},
+			}),
+			db.execute(sql`
+				WITH rating_stats AS (
+				  SELECT 
+					AVG(rating)::numeric(2,1) as avg_rating,
+					COUNT(*) as total_ratings
+				  FROM ${station_ratings}
+				  WHERE location_id = ${locationId}
+				),
+				category_counts AS (
+				  SELECT 
+					sc.category,
+					COUNT(*) as count
+				  FROM ${station_ratings} sr
+				  JOIN ${station_categories} sc ON sc.rating_id = sr.id
+				  WHERE sr.location_id = ${locationId}
+				  GROUP BY sc.category
+				  ORDER BY count DESC
+				  LIMIT 2
+				)
+				SELECT 
+				  rs.avg_rating,
+				  rs.total_ratings,
+				  COALESCE(
+					jsonb_agg(
+					  jsonb_build_object(
+						'category', cc.category,
+						'count', cc.count
+					  )
+					),
+					'[]'::jsonb
+				  ) as top_categories
+				FROM rating_stats rs
+				LEFT JOIN category_counts cc ON true
+				GROUP BY rs.avg_rating, rs.total_ratings
+			  `),
+		]);
 
-		if (!result || !result.esInfo) {
+		if (!details || !details.esInfo) {
 			return null;
 		}
 
 		return {
-			id: result.id,
-			location_id: result.external_id,
-			address: result.esInfo.direccion || "",
-			city: result.esInfo.localidad || "",
-			province: result.esInfo.provincia || "",
-			postalCode: result.esInfo.cp || "",
-			schedule: result.esInfo.horario || "",
+			id: details.id,
+			location_id: details.external_id,
+			address: details.esInfo.direccion || "",
+			city: details.esInfo.localidad || "",
+			province: details.esInfo.provincia || "",
+			postalCode: details.esInfo.cp || "",
+			schedule: details.esInfo.horario || "",
+			rating:
+				typeof rating.rows[0]?.avg_rating === "number"
+					? rating.rows[0].avg_rating
+					: null,
+			total_ratings: Number(rating.rows[0]?.total_ratings) || 0,
+			top_categories: Array.isArray(rating.rows[0]?.top_categories)
+				? rating.rows[0]?.top_categories
+				: typeof rating.rows[0]?.top_categories === "string"
+					? JSON.parse(rating.rows[0]?.top_categories || "[]")
+					: rating.rows[0]?.top_categories || [],
 		};
 	} catch (error) {
 		console.error("Error fetching station details:", error);

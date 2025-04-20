@@ -94,6 +94,8 @@ export default function Home() {
 	// Search handling
 	const handleSearch = async () => {
 		if ((!origin && !currentLocation) || !destination) return;
+		setSelectedPOI(null);
+		setError(null);
 
 		setIsLoading(true);
 
