@@ -76,14 +76,14 @@ const categories = [
 	},
 ];
 
-function RankPage({ params }: { params: { stationID: string } }) {
+function RankPage({ params }: { params: Promise<{ stationID: string }> }) {
 	// const { toast } = useToast();
 	const [primaryCategory, setPrimaryCategory] = useState<string>("");
 	const [secondaryCategory, setSecondaryCategory] = useState<string>("");
 	const [appreciation, setAppreciation] = useState("");
 	const [recommendation, setRecommendation] = useState("");
 	const [starRating, setStarRating] = useState<number>(0);
-	//@ts-expect-error
+
 	const par = React.use(params);
 
 	const handleSubmit = async () => {
@@ -93,7 +93,6 @@ function RankPage({ params }: { params: { stationID: string } }) {
 		}
 
 		const result = await rateStation({
-			// @ts-expect-error
 			locationId: par.stationID,
 			rating: starRating,
 			primaryCategory,
