@@ -21,8 +21,6 @@ export default function ServiceStationPopup({
 
 	console.log("Station details:", station);
 
-	const bestCategories = ["Kids friendly", "Food & drink"];
-
 	return (
 		<Card className="w-[350px] relative py-2 gap-3 border-0 border-transparent shadow-transparent">
 			<CardContent className="p-2">
@@ -58,7 +56,7 @@ export default function ServiceStationPopup({
 							<div className="flex items-center">
 								<Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
 								<span className="font-medium text-lg">
-									{/* {rating.toFixed(1)} */}5
+									{station.details.rating.toFixed(1)}
 								</span>
 								<span className="text-xs text-muted-foreground">/5</span>
 							</div>

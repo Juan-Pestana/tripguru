@@ -23,52 +23,53 @@ import {
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { rateStation } from "@/actions/rateStation";
+import React from "react";
 
 const categories = [
 	{
-		id: "snacks",
+		id: "Snacks & Coffee",
 		label: "Snacks & Coffee",
 		icon: Coffee,
 		description: "Great for quick bites and coffee breaks",
 	},
 	{
-		id: "menu",
+		id: "Full Menu",
 		label: "Full Menu",
 		icon: UtensilsCrossed,
 		description: "Complete dining experience",
 	},
 	{
-		id: "store",
+		id: "Local Products Store",
 		label: "Local Products Store",
 		icon: Store,
 		description: "Local and convenience items",
 	},
 	{
-		id: "gas",
+		id: "Gas & Go",
 		label: "Gas & Go",
 		icon: Fuel,
 		description: "Quick refueling service",
 	},
 	{
-		id: "kids",
+		id: "Kids Area",
 		label: "Kids Area",
 		icon: Baby,
 		description: "great for families with children",
 	},
 	{
-		id: "bath",
+		id: "Clean Restrooms",
 		label: "Clean Restrooms",
 		icon: Toilet,
 		description: "Clean and well-maintained restrooms",
 	},
 	{
-		id: "price",
+		id: "Best Price",
 		label: "Best Price",
 		icon: BadgeEuro,
 		description: "Competitive fuel price",
 	},
 	{
-		id: "sights",
+		id: "Beautiful Sights",
 		label: "Beautiful Sights",
 		icon: Trees,
 		description: "Scenic views and nature",
@@ -82,6 +83,8 @@ function RankPage({ params }: { params: { stationID: string } }) {
 	const [appreciation, setAppreciation] = useState("");
 	const [recommendation, setRecommendation] = useState("");
 	const [starRating, setStarRating] = useState<number>(0);
+	//@ts-expect-error
+	const par = React.use(params);
 
 	const handleSubmit = async () => {
 		if (!primaryCategory || starRating === 0) {
@@ -90,7 +93,8 @@ function RankPage({ params }: { params: { stationID: string } }) {
 		}
 
 		const result = await rateStation({
-			locationId: params.stationID,
+			// @ts-expect-error
+			locationId: par.stationID,
 			rating: starRating,
 			primaryCategory,
 			secondaryCategory: secondaryCategory || undefined,
@@ -112,6 +116,7 @@ function RankPage({ params }: { params: { stationID: string } }) {
 	};
 
 	const handleCategorySelect = (categoryId: string) => {
+		console.log(categoryId);
 		if (primaryCategory === categoryId) {
 			setPrimaryCategory("");
 		} else if (secondaryCategory === categoryId) {

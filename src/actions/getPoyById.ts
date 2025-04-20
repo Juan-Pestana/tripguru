@@ -28,6 +28,12 @@ export interface StationDetails {
 	}[];
 }
 
+interface RatingQueryResult extends Record<string, unknown> {
+	avg_rating: string | null;
+	total_ratings: string;
+	top_categories: string;
+}
+
 export async function getStationDetails(
 	locationId: string,
 ): Promise<StationDetails | null> {
@@ -39,7 +45,7 @@ export async function getStationDetails(
 					esInfo: true,
 				},
 			}),
-			db.execute(sql`
+			db.execute<RatingQueryResult>(sql`
 				WITH rating_stats AS (
 				  SELECT 
 					AVG(rating)::numeric(2,1) as avg_rating,
@@ -80,6 +86,8 @@ export async function getStationDetails(
 			return null;
 		}
 
+		const ratingData = rating.rows[0];
+
 		return {
 			id: details.id,
 			location_id: details.external_id,
@@ -88,11 +96,12 @@ export async function getStationDetails(
 			province: details.esInfo.provincia || "",
 			postalCode: details.esInfo.cp || "",
 			schedule: details.esInfo.horario || "",
-			rating:
-				typeof rating.rows[0]?.avg_rating === "number"
-					? rating.rows[0].avg_rating
-					: null,
-			total_ratings: Number(rating.rows[0]?.total_ratings) || 0,
+			rating: ratingData?.avg_rating
+				? Number.parseFloat(ratingData.avg_rating)
+				: null,
+			total_ratings: ratingData?.total_ratings
+				? Number.parseInt(ratingData.total_ratings, 10)
+				: 0,
 			top_categories: Array.isArray(rating.rows[0]?.top_categories)
 				? rating.rows[0]?.top_categories
 				: typeof rating.rows[0]?.top_categories === "string"
