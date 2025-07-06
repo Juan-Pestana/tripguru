@@ -23,7 +23,7 @@ const MapComponent = dynamic(() => import("@/components/MapComponent"), {
     <div className="h-full w-full bg-gray-100 flex items-center justify-center">
       Loading map...
     </div>
-  ),
+  )
 });
 
 export default function Home() {
@@ -54,7 +54,7 @@ export default function Home() {
     setShowRightSideOnly,
     setSelectedPOI,
     fetchPOIs,
-    setFilteredPois,
+    setFilteredPois
   } = usePOIs();
 
   // Location handling
@@ -105,14 +105,14 @@ export default function Home() {
     const routeResult = await fetchRoute({
       origin,
       destination,
-      currentLocation,
+      currentLocation
     });
 
     if (routeResult) {
       await fetchPOIs(routeResult.coordinates, {
         fuelType,
         connectionType,
-        selectedTypes: selectedPOITypes,
+        selectedTypes: selectedPOITypes
       });
     }
     setIsLoading(false);
