@@ -18,169 +18,169 @@ import MapContainer from "@/components/MapContainer";
 
 // Dynamically import the Map component to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/MapComponent"), {
-	ssr: false,
-	loading: () => (
-		<div className="h-full w-full bg-gray-100 flex items-center justify-center">
-			Loading map...
-		</div>
-	),
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+      Loading map...
+    </div>
+  ),
 });
 
 export default function Home() {
-	// Core state
-	const [origin, setOrigin] = useState("");
-	const [destination, setDestination] = useState("");
-	const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(
-		null,
-	);
-	const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
+  // Core state
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(
+    null
+  );
+  const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-	// POI selection state
-	const [selectedPOITypes, setSelectedPOITypes] = useState<Set<POIType>>(
-		new Set(["service_station"]),
-	);
-	const [fuelType, setFuelType] = useState("gasoleo_a");
-	const [connectionType, setConnectionType] = useState("CCS (Type 2)");
-	const [isLoading, setIsLoading] = useState(false);
+  // POI selection state
+  const [selectedPOITypes, setSelectedPOITypes] = useState<Set<POIType>>(
+    new Set(["service_station"])
+  );
+  const [fuelType, setFuelType] = useState("gasoleo_a");
+  const [connectionType, setConnectionType] = useState("CCS (Type 2)");
+  const [isLoading, setIsLoading] = useState(false);
 
-	// Route and POIs state managed by custom hooks
-	const { route, fetchRoute, error: routeError, setRoute } = useRoute();
-	const {
-		filteredPois,
-		selectedPOI,
-		showRightSideOnly,
-		error: poisError,
-		setShowRightSideOnly,
-		setSelectedPOI,
-		fetchPOIs,
-		setFilteredPois,
-	} = usePOIs();
+  // Route and POIs state managed by custom hooks
+  const { route, fetchRoute, error: routeError, setRoute } = useRoute();
+  const {
+    filteredPois,
+    selectedPOI,
+    showRightSideOnly,
+    error: poisError,
+    setShowRightSideOnly,
+    setSelectedPOI,
+    fetchPOIs,
+    setFilteredPois,
+  } = usePOIs();
 
-	// Location handling
-	const handleGetCurrentLocation = async () => {
-		setIsLoadingLocation(true);
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-				(position) => {
-					const { latitude, longitude } = position.coords;
-					setCurrentLocation({ lat: latitude, lng: longitude });
+  // Location handling
+  const handleGetCurrentLocation = async () => {
+    setIsLoadingLocation(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
 
-					// Convert coordinates to address using reverse geocoding
-					reverseGeocode(latitude, longitude)
-						.then((address) => {
-							//setOrigin(address);
-							setIsLoadingLocation(false);
-						})
-						.catch((err) => {
-							console.error("Reverse geocoding error:", err);
-							setOrigin(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-							setIsLoadingLocation(false);
-						});
-				},
-				(error) => {
-					console.error("Geolocation error:", error);
-					setError(
-						"Could not get your current location. Please allow location access.",
-					);
-					setIsLoadingLocation(false);
-				},
-			);
-		} else {
-			setError("Geolocation is not supported by your browser.");
-			setIsLoadingLocation(false);
-		}
-	};
+          // Convert coordinates to address using reverse geocoding
+          reverseGeocode(latitude, longitude)
+            .then((address) => {
+              //setOrigin(address);
+              setIsLoadingLocation(false);
+            })
+            .catch((err) => {
+              console.error("Reverse geocoding error:", err);
+              setOrigin(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+              setIsLoadingLocation(false);
+            });
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setError(
+            "Could not get your current location. Please allow location access."
+          );
+          setIsLoadingLocation(false);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by your browser.");
+      setIsLoadingLocation(false);
+    }
+  };
 
-	// Search handling
-	const handleSearch = async () => {
-		if ((!origin && !currentLocation) || !destination) return;
-		setSelectedPOI(null);
-		setRoute(null);
-		setError(null);
-		setFilteredPois([]);
+  // Search handling
+  const handleSearch = async () => {
+    if ((!origin && !currentLocation) || !destination) return;
+    setSelectedPOI(null);
+    setRoute(null);
+    setError(null);
+    setFilteredPois([]);
 
-		setIsLoading(true);
+    setIsLoading(true);
 
-		const routeResult = await fetchRoute({
-			origin,
-			destination,
-			currentLocation,
-		});
+    const routeResult = await fetchRoute({
+      origin,
+      destination,
+      currentLocation,
+    });
 
-		if (routeResult) {
-			await fetchPOIs(routeResult.coordinates, {
-				fuelType,
-				connectionType,
-				selectedTypes: selectedPOITypes,
-			});
-		}
-		setIsLoading(false);
-	};
+    if (routeResult) {
+      await fetchPOIs(routeResult.coordinates, {
+        fuelType,
+        connectionType,
+        selectedTypes: selectedPOITypes,
+      });
+    }
+    setIsLoading(false);
+  };
 
-	return (
-		<div className="flex flex-col md:flex-row h-screen">
-			<Card className="w-full md:w-1/3 p-4 overflow-auto h-screen">
-				<CardHeader>
-					<CardTitle>Route & Service Stations</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<LocationInput
-						origin={origin}
-						destination={destination}
-						currentLocation={currentLocation}
-						isLoadingLocation={isLoadingLocation}
-						onOriginChange={setOrigin}
-						onDestinationChange={setDestination}
-						onGetCurrentLocation={handleGetCurrentLocation}
-					/>
+  return (
+    <div className="flex flex-col md:flex-row h-screen">
+      <Card className="w-full md:w-1/3 p-4 overflow-auto h-screen">
+        <CardHeader>
+          <CardTitle>Route & Service Stations</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <LocationInput
+            origin={origin}
+            destination={destination}
+            currentLocation={currentLocation}
+            isLoadingLocation={isLoadingLocation}
+            onOriginChange={setOrigin}
+            onDestinationChange={setDestination}
+            onGetCurrentLocation={handleGetCurrentLocation}
+          />
 
-					<POITypeSelector
-						selectedTypes={selectedPOITypes}
-						onTypeChange={setSelectedPOITypes}
-						fuelType={fuelType}
-						connectionType={connectionType}
-						onFuelTypeChange={setFuelType}
-						onConnectionTypeChange={setConnectionType}
-					/>
+          <POITypeSelector
+            selectedTypes={selectedPOITypes}
+            onTypeChange={setSelectedPOITypes}
+            fuelType={fuelType}
+            connectionType={connectionType}
+            onFuelTypeChange={setFuelType}
+            onConnectionTypeChange={setConnectionType}
+          />
 
-					<Button
-						onClick={handleSearch}
-						className="w-full"
-						disabled={(!origin && !currentLocation) || !destination}
-					>
-						<Navigation className="mr-2" size={18} />
-						Find Route and Stations
-					</Button>
+          <Button
+            onClick={handleSearch}
+            className="w-full"
+            disabled={(!origin && !currentLocation) || !destination}
+          >
+            <Navigation className="mr-2" size={18} />
+            Find Route and Stations
+          </Button>
 
-					{isLoading && <Spinner />}
-					{(routeError || poisError) && (
-						<div className="text-red-500 p-3 bg-red-50 rounded-md">
-							{routeError || poisError}
-						</div>
-					)}
+          {isLoading && <Spinner />}
+          {(routeError || poisError) && (
+            <div className="text-red-500 p-3 bg-red-50 rounded-md">
+              {routeError || poisError}
+            </div>
+          )}
 
-					{route && (
-						<RouteInfo route={route} isLoading={isLoading} error={error} />
-					)}
+          {route && (
+            <RouteInfo route={route} isLoading={isLoading} error={error} />
+          )}
 
-					{filteredPois.length > 0 && (
-						<POIList
-							pois={filteredPois}
-							showRightSideOnly={showRightSideOnly}
-							onPOIClick={setSelectedPOI}
-							onFilterChange={setShowRightSideOnly}
-						/>
-					)}
-				</CardContent>
-			</Card>
+          {filteredPois.length > 0 && (
+            <POIList
+              pois={filteredPois}
+              showRightSideOnly={showRightSideOnly}
+              onPOIClick={setSelectedPOI}
+              onFilterChange={setShowRightSideOnly}
+            />
+          )}
+        </CardContent>
+      </Card>
 
-			<MapContainer
-				route={route?.coordinates}
-				stations={filteredPois}
-				showRightSideOnly={showRightSideOnly}
-				selectedStation={selectedPOI}
-			/>
-		</div>
-	);
+      <MapContainer
+        route={route?.coordinates}
+        stations={filteredPois}
+        showRightSideOnly={showRightSideOnly}
+        selectedStation={selectedPOI}
+      />
+    </div>
+  );
 }

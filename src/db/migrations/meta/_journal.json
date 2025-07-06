@@ -22,6 +22,20 @@
       "when": 1745167748859,
       "tag": "0002_easy_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751820501163,
+      "tag": "0003_curly_warbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751828126230,
+      "tag": "0004_remarkable_taskmaster",
+      "breakpoints": true
     }
   ]
 }
