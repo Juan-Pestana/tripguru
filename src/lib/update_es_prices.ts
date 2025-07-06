@@ -113,15 +113,14 @@ async function fetchAndSaveCSV() {
     parsePrice(loc["Precio Hidrogeno"])
   ]);
 
-  console.log("Fetched records:", records.slice(0, 5)); // Log first 5 records for debugging
-
+  // Write to CSV file
   const csv = stringify(records, {
     header: true,
     columns: columns,
     delimiter: ",",
     quoted: true
   });
-  //const csv = stringify(fileCont, { header: true, quoted: true });
+
   fs.writeFileSync(CSV_PATH, csv);
   console.log("CSV saved:", CSV_PATH);
 }
