@@ -120,7 +120,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      <Card className="w-full md:w-1/3 p-4 overflow-auto h-screen">
+      <Card className="w-full md:w-1/3 p-4 overflow-auto h-full">
         <CardHeader>
           <CardTitle>Route & Service Stations</CardTitle>
         </CardHeader>

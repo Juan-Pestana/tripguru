@@ -2,8 +2,8 @@ name: Update es_info daily
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Runs every day at 03:00 UTC
-  workflow_dispatch:      # Allows manual trigger
+    - cron: "0 10 * * *" # Runs every day at 03:00 UTC
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   update-es-info:
