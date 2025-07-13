@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "lucide-react";
@@ -27,35 +28,79 @@ const MapComponent = dynamic(() => import("@/components/MapComponent"), {
 });
 
 export default function Home() {
-  // Core state
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
-  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(
-    null
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  //url state
+  const origin = searchParams.get("origin") || "";
+  const destination = searchParams.get("destination") || "";
+  const currentLocation =
+    searchParams.get("lat") && searchParams.get("lng")
+      ? {
+          lat: Number(searchParams.get("lat")),
+          lng: Number(searchParams.get("lng"))
+        }
+      : null;
+  const fuelType = searchParams.get("fuelType") || "gasoleo_a";
+  const connectionType = searchParams.get("connectionType") || "CCS (Type 2)";
+  const selectedPOITypes = new Set<POIType>(
+    (searchParams.get("selectedTypes") || "service_station").split(
+      ","
+    ) as POIType[]
   );
+
+  // local state
+
+  const [stateorigin, setOrigin] = useState(origin);
+  const [statedestination, setDestination] = useState(destination);
+  const [stateCurrentLocation, setCurrentLocation] =
+    useState<Coordinates | null>(currentLocation);
   const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // POI selection state
-  const [selectedPOITypes, setSelectedPOITypes] = useState<Set<POIType>>(
-    new Set(["service_station"])
+  const [stateselectedPOITypes, setSelectedPOITypes] = useState<Set<POIType>>(
+    selectedPOITypes || new Set(["service_station"])
   );
-  const [fuelType, setFuelType] = useState("gasoleo_a");
-  const [connectionType, setConnectionType] = useState("CCS (Type 2)");
-  const [isLoading, setIsLoading] = useState(false);
+  const [statefuelType, setFuelType] = useState(fuelType || "gasoleo_a");
+  const [stateconnectionType, setConnectionType] = useState(
+    connectionType || "CCS (Type 2)"
+  );
+  //const [isLoading, setIsLoading] = useState(false);
 
-  // Route and POIs state managed by custom hooks
-  const { route, fetchRoute, error: routeError, setRoute } = useRoute();
+  const {
+    route,
+    isLoading,
+    error: routeError
+  } = useRoute(
+    origin && destination
+      ? {
+          origin,
+          destination,
+          currentLocation
+        }
+      : null
+  );
   const {
     filteredPois,
+    pois,
     selectedPOI,
     showRightSideOnly,
     error: poisError,
+    isLoading: poisLoading,
     setShowRightSideOnly,
     setSelectedPOI,
-    fetchPOIs,
-    setFilteredPois
-  } = usePOIs();
+    refetch
+  } = usePOIs(
+    route?.coordinates,
+    {
+      selectedTypes: selectedPOITypes,
+      fuelType,
+      connectionType,
+      radius: 200 // or any value you want, or make it stateful
+    },
+    !!route // enabled only if route exists
+  );
 
   // Location handling
   const handleGetCurrentLocation = async () => {
@@ -93,29 +138,22 @@ export default function Home() {
   };
 
   // Search handling
-  const handleSearch = async () => {
-    if ((!origin && !currentLocation) || !destination) return;
-    setSelectedPOI(null);
-    setRoute(null);
-    setError(null);
-    setFilteredPois([]);
+  const handleSearch = () => {
+    if ((!stateorigin && !stateCurrentLocation) || !statedestination) return;
 
-    setIsLoading(true);
-
-    const routeResult = await fetchRoute({
-      origin,
-      destination,
-      currentLocation
-    });
-
-    if (routeResult) {
-      await fetchPOIs(routeResult.coordinates, {
-        fuelType,
-        connectionType,
-        selectedTypes: selectedPOITypes
-      });
+    const params = new URLSearchParams();
+    params.set("origin", stateorigin);
+    params.set("destination", statedestination);
+    if (stateCurrentLocation) {
+      params.set("lat", stateCurrentLocation.lat.toString());
+      params.set("lng", stateCurrentLocation.lng.toString());
     }
-    setIsLoading(false);
+    params.set("fuelType", statefuelType);
+    params.set("connectionType", stateconnectionType);
+    params.set("selectedTypes", Array.from(stateselectedPOITypes).join(","));
+
+    router.push(`/?${params.toString()}`);
+    console.log("Search params updated:", params.toString());
   };
 
   return (
@@ -126,9 +164,9 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-6">
           <LocationInput
-            origin={origin}
-            destination={destination}
-            currentLocation={currentLocation}
+            origin={stateorigin}
+            destination={statedestination}
+            currentLocation={stateCurrentLocation}
             isLoadingLocation={isLoadingLocation}
             onOriginChange={setOrigin}
             onDestinationChange={setDestination}
@@ -136,10 +174,10 @@ export default function Home() {
           />
 
           <POITypeSelector
-            selectedTypes={selectedPOITypes}
+            selectedTypes={stateselectedPOITypes}
             onTypeChange={setSelectedPOITypes}
-            fuelType={fuelType}
-            connectionType={connectionType}
+            fuelType={statefuelType}
+            connectionType={stateconnectionType}
             onFuelTypeChange={setFuelType}
             onConnectionTypeChange={setConnectionType}
           />
@@ -147,17 +185,17 @@ export default function Home() {
           <Button
             onClick={handleSearch}
             className="w-full"
-            disabled={(!origin && !currentLocation) || !destination}
+            disabled={
+              (!stateorigin && !stateCurrentLocation) || !statedestination
+            }
           >
             <Navigation className="mr-2" size={18} />
             Find Route and Stations
           </Button>
 
           {isLoading && <Spinner />}
-          {(routeError || poisError) && (
-            <div className="text-red-500 p-3 bg-red-50 rounded-md">
-              {routeError || poisError}
-            </div>
+          {error && (
+            <div className="text-red-500 p-3 bg-red-50 rounded-md">{error}</div>
           )}
 
           {route && (
@@ -166,7 +204,15 @@ export default function Home() {
 
           {filteredPois.length > 0 && (
             <POIList
-              pois={filteredPois}
+              pois={filteredPois.map((poi) => ({
+                ...poi,
+                side:
+                  poi.side === "right" ||
+                  poi.side === "left" ||
+                  poi.side === "unknown"
+                    ? poi.side
+                    : "unknown"
+              }))}
               showRightSideOnly={showRightSideOnly}
               onPOIClick={setSelectedPOI}
               onFilterChange={setShowRightSideOnly}
@@ -177,7 +223,15 @@ export default function Home() {
 
       <MapContainer
         route={route?.coordinates}
-        stations={filteredPois}
+        stations={filteredPois.map((poi) => ({
+          ...poi,
+          side:
+            poi.side === "right"
+              ? "right"
+              : poi.side === "left"
+                ? "left"
+                : "unknown"
+        }))}
         showRightSideOnly={showRightSideOnly}
         selectedStation={selectedPOI}
       />

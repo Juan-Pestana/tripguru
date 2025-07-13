@@ -1,103 +1,103 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import type { POI } from "@/types/types";
-import {
-	getAllPOIs,
-	getEVChargingPoints,
-	getServiceStations,
-} from "@/actions/getPois2";
+//import { fetchPOIs } from "./useFetchPOIs"; // Move your fetchPOIs function to a separate file if needed
 import { isStationOnRightSide } from "@/lib/utils";
 
 interface FetchPOIsOptions {
-	selectedTypes: Set<string>;
-	fuelType: string;
-	connectionType: string;
-	radius?: number;
+  selectedTypes: Set<string>;
+  fuelType: string;
+  connectionType: string;
+  radius?: number;
+}
+// Function to fetch POIs based on route coordinates and options
+// This function can be moved to a separate file if needed
+export async function fetchPOIs(
+  routeCoordinates: [number, number][],
+  options: FetchPOIsOptions
+): Promise<POI[]> {
+  const { selectedTypes, fuelType, connectionType, radius = 200 } = options;
+  console.log(selectedTypes);
+  const body = {
+    routeCoordinates,
+    fuel_type: selectedTypes.has("service_station") ? fuelType : undefined,
+    connection_type: selectedTypes.has("ev_charging_point")
+      ? connectionType
+      : undefined,
+    radius
+  };
+
+  const res = await fetch("/api/pois", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch POIs");
+  }
+
+  return res.json();
 }
 
-export function usePOIs() {
-	const [pois, setPois] = useState<POI[]>([]);
-	const [filteredPois, setFilteredPois] = useState<POI[]>([]);
-	const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
-	const [showRightSideOnly, setShowRightSideOnly] = useState(true);
+export function usePOIs(
+  routeCoordinates: [number, number][] | undefined,
+  options: FetchPOIsOptions | undefined,
+  enabled: boolean = true
+) {
+  const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
+  const [showRightSideOnly, setShowRightSideOnly] = useState(true);
 
-	const [error, setError] = useState<string | null>(null);
+  // Fetch POIs using TanStack Query
+  const {
+    data: pois = [],
+    error,
+    isLoading,
+    refetch
+  } = useQuery<POI[], Error>({
+    queryKey: ["pois", routeCoordinates, options],
+    queryFn: () => {
+      if (!routeCoordinates || !options) throw new Error("Missing params");
+      return fetchPOIs(routeCoordinates, options);
+    },
+    enabled: !!routeCoordinates && !!options && enabled,
+    staleTime: 1000 * 60 * 5
+  });
 
-	const fetchPOIs = async (
-		routeCoordinates: [number, number][],
-		options: FetchPOIsOptions,
-	) => {
-		const { selectedTypes, fuelType, connectionType, radius = 200 } = options;
+  // Add side info to POIs
+  const processedPois = useMemo(
+    () =>
+      pois.map((poi) => ({
+        ...poi,
+        side: isStationOnRightSide(routeCoordinates ?? [], poi.coordinates)
+          ? "right"
+          : "left"
+      })),
+    [pois, routeCoordinates]
+  );
 
-		try {
-			setError(null);
-			let fetchedPois: POI[] = [];
+  // Filter POIs based on side
+  const filteredPois = useMemo(
+    () =>
+      showRightSideOnly
+        ? processedPois.filter((poi) => poi.side === "right")
+        : processedPois,
+    [processedPois, showRightSideOnly]
+  );
 
-			if (selectedTypes.size === 2) {
-				// Both types selected
-				fetchedPois = await getAllPOIs(
-					routeCoordinates,
-					fuelType,
-					connectionType,
-					radius,
-				);
-			} else if (selectedTypes.has("service_station")) {
-				// Only service stations
-				fetchedPois = await getServiceStations(
-					routeCoordinates,
-					fuelType,
-					radius,
-				);
-			} else if (selectedTypes.has("ev_charging_point")) {
-				// Only EV charging points
-				fetchedPois = await getEVChargingPoints(
-					routeCoordinates,
-					connectionType,
-					radius,
-				);
-			}
+  const updateFilter = (showRightOnly: boolean) => {
+    setShowRightSideOnly(showRightOnly);
+  };
 
-			// Process POIs to determine their side of the road
-			const processedPois = fetchedPois.map(
-				(poi) =>
-					({
-						...poi,
-						side: isStationOnRightSide(routeCoordinates, poi.coordinates)
-							? "right"
-							: "left",
-					}) as POI,
-			);
-
-			setPois(processedPois);
-			// Apply right-side filter if enabled
-			setFilteredPois(
-				showRightSideOnly
-					? processedPois.filter((poi) => poi.side === "right")
-					: processedPois,
-			);
-		} catch (err) {
-			console.error("Error fetching POIs:", err);
-			setError("Failed to fetch points of interest");
-		}
-	};
-
-	// Update filtered POIs when filter changes
-	const updateFilter = (showRightOnly: boolean) => {
-		setShowRightSideOnly(showRightOnly);
-		setFilteredPois(
-			showRightOnly ? pois.filter((poi) => poi.side === "right") : pois,
-		);
-	};
-
-	return {
-		pois,
-		filteredPois,
-		selectedPOI,
-		showRightSideOnly,
-
-		error,
-		setFilteredPois,
-		setShowRightSideOnly: updateFilter,
-		setSelectedPOI,
-		fetchPOIs,
-	};
+  return {
+    pois: processedPois,
+    filteredPois,
+    selectedPOI,
+    showRightSideOnly,
+    error: error?.message ?? null,
+    isLoading,
+    setShowRightSideOnly: updateFilter,
+    setSelectedPOI,
+    refetch
+  };
 }

@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(pois);
   } catch (error) {
+    console.error("Error fetching POIs:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

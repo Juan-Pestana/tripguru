@@ -10,60 +10,60 @@ type EsInfo = InferSelectModel<typeof es_info>;
 
 // Base types for all POIs
 interface BasePOI {
-	id: string;
-	name: string;
-	location_id: string;
-	coordinates: [number, number];
-	distance: number;
-	distanceAlongRoute: number;
-	side: "left" | "right" | "unknown";
+  id: string;
+  name: string;
+  location_id: string;
+  coordinates: [number, number];
+  distance: number;
+  distanceAlongRoute: number;
+  side: "left" | "right" | "unknown";
 }
 
 export interface ServiceStationPOI extends BasePOI {
-	type: "service_station";
-	fuel_price: number | null;
+  type: "service_station";
+  fuel_price: number | null;
 }
 
 export interface EVChargingPOI extends BasePOI {
-	type: "ev_charging_point";
-	operator: string;
-	usage_cost: string | null;
-	access_type: string;
-	is_operational: boolean;
-	connections: Array<{
-		type: string;
-		power_kw: number;
-		quantity: number;
-	}>;
+  type: "ev_charging_point";
+  operator: string;
+  usage_cost: string | null;
+  access_type: string;
+  is_operational: boolean;
+  connections: Array<{
+    type: string;
+    power_kw: number;
+    quantity: number;
+  }>;
 }
 
 export type POI = ServiceStationPOI | EVChargingPOI;
 
 // Get only service stations
 export async function getServiceStations(
-	routeCoordinates: [number, number][],
-	fuel_type: string,
-	radius = 200,
+  routeCoordinates: [number, number][],
+  fuel_type: string,
+  radius = 200
 ): Promise<ServiceStationPOI[]> {
-	const linestring = `LINESTRING(${routeCoordinates
-		.map((coord) => `${coord[1]} ${coord[0]}`)
-		.join(", ")})`;
+  const linestring = `LINESTRING(${routeCoordinates
+    .map((coord) => `${coord[1]} ${coord[0]}`)
+    .join(", ")})`;
 
-	const fuelColumn = sql.identifier(fuel_type);
+  const fuelColumn = sql.identifier(fuel_type);
 
-	const pois = await db.execute(sql`
+  const pois = await db.execute(sql`
       WITH route AS (
         SELECT ST_GeomFromText(${linestring}, 4326) as geom
       )
-      SELECT 
+      SELECT
         l.id,
         l.name,
         l.external_id,
         ST_X(l.location::geometry) as longitude,
         ST_Y(l.location::geometry) as latitude,
-        ST_LineLocatePoint(route.geom, l.location::geometry) * 
+        ST_LineLocatePoint(route.geom, l.location::geometry) *
           ST_Length(route.geom::geography) as distance_along_route,
-        ST_Distance(l.location::geometry::geography, route.geom::geography) 
+        ST_Distance(l.location::geometry::geography, route.geom::geography)
           as distance_from_route,
         e.${fuelColumn} as fuel_price
       FROM ${locations} l
@@ -75,45 +75,45 @@ export async function getServiceStations(
       ORDER BY distance_along_route ASC;
     `);
 
-	return pois.rows.map(
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		(poi: any) => ({
-			id: poi.id.toString(),
-			location_id: poi.external_id,
-			name: poi.name,
-			type: "service_station" as const,
-			coordinates: [poi.latitude, poi.longitude],
-			distance: Math.round(poi.distance_from_route),
-			distanceAlongRoute: Math.round(poi.distance_along_route),
-			fuel_price: poi.fuel_price ? Number(poi.fuel_price) : null,
-			side: "unknown",
-		}),
-	);
+  return pois.rows.map(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    (poi: any) => ({
+      id: poi.id.toString(),
+      location_id: poi.external_id,
+      name: poi.name,
+      type: "service_station" as const,
+      coordinates: [poi.latitude, poi.longitude],
+      distance: Math.round(poi.distance_from_route),
+      distanceAlongRoute: Math.round(poi.distance_along_route),
+      fuel_price: poi.fuel_price ? Number(poi.fuel_price) : null,
+      side: "unknown"
+    })
+  );
 }
 
 // Get only EV charging points
 export async function getEVChargingPoints(
-	routeCoordinates: [number, number][],
-	connection_type: string,
-	radius = 500,
+  routeCoordinates: [number, number][],
+  connection_type: string,
+  radius = 500
 ): Promise<EVChargingPOI[]> {
-	const linestring = `LINESTRING(${routeCoordinates
-		.map((coord) => `${coord[1]} ${coord[0]}`)
-		.join(", ")})`;
+  const linestring = `LINESTRING(${routeCoordinates
+    .map((coord) => `${coord[1]} ${coord[0]}`)
+    .join(", ")})`;
 
-	const pois = await db.execute(sql`
+  const pois = await db.execute(sql`
             WITH route AS (
               SELECT ST_GeomFromText(${linestring}, 4326) as geom
             )
-            SELECT 
+            SELECT
               l.id,
               l.external_id,
               l.name,
               ST_X(l.location::geometry) as longitude,
               ST_Y(l.location::geometry) as latitude,
-              ST_LineLocatePoint(route.geom, l.location::geometry) * 
+              ST_LineLocatePoint(route.geom, l.location::geometry) *
                 ST_Length(route.geom::geography) as distance_along_route,
-              ST_Distance(l.location::geometry::geography, route.geom::geography) 
+              ST_Distance(l.location::geometry::geography, route.geom::geography)
                 as distance_from_route,
               ev.operator,
               ev.usage_cost,
@@ -131,9 +131,9 @@ export async function getEVChargingPoints(
             WHERE ST_DWithin(l.location::geometry::geography, route.geom::geography, ${radius})
             AND l.type = 'ev_charging_point'
             AND ct.connection_type = ${connection_type}
-            GROUP BY 
-              l.id, 
-              l.name, 
+            GROUP BY
+              l.id,
+              l.name,
               l.location,
               ev.operator,
               ev.usage_cost,
@@ -143,56 +143,57 @@ export async function getEVChargingPoints(
             ORDER BY distance_along_route ASC;
           `);
 
-	console.log("EV Charging Points:", pois.rows);
+  console.log("EV Charging Points:", pois.rows);
 
-	return pois.rows.map(
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		(poi: any) => ({
-			id: poi.id.toString(),
-			location_id: poi.external_id,
-			name: poi.name,
-			type: "ev_charging_point" as const,
-			coordinates: [poi.latitude, poi.longitude],
-			distance: Math.round(poi.distance_from_route),
-			distanceAlongRoute: Math.round(poi.distance_along_route),
-			operator: poi.operator,
-			usage_cost: poi.usage_cost,
-			access_type: poi.access_type,
-			is_operational: poi.is_operational,
-			connections: poi.connections,
-			side: "unknown",
-		}),
-	);
+  return pois.rows.map(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    (poi: any) => ({
+      id: poi.id.toString(),
+      location_id: poi.external_id,
+      name: poi.name,
+      type: "ev_charging_point" as const,
+      coordinates: [poi.latitude, poi.longitude],
+      distance: Math.round(poi.distance_from_route),
+      distanceAlongRoute: Math.round(poi.distance_along_route),
+      operator: poi.operator,
+      usage_cost: poi.usage_cost,
+      access_type: poi.access_type,
+      is_operational: poi.is_operational,
+      connections: poi.connections,
+      side: "unknown"
+    })
+  );
 }
 
 // Get both types of POIs
 export async function getAllPOIs(
-	routeCoordinates: [number, number][],
-	fuel_type: string,
-	connection_type: string,
-	radius = 200,
+  routeCoordinates: [number, number][],
+  fuel_type: string,
+  connection_type: string,
+  radius = 200
 ): Promise<POI[]> {
-	const linestring = `LINESTRING(${routeCoordinates
-		.map((coord) => `${coord[1]} ${coord[0]}`)
-		.join(", ")})`;
+  const linestring = `LINESTRING(${routeCoordinates
+    .map((coord) => `${coord[1]} ${coord[0]}`)
+    .join(", ")})`;
 
-	const fuelColumn = sql.identifier(fuel_type);
+  const fuelColumn = sql.identifier(fuel_type);
 
-	const pois = await db.execute(sql`
+  const pois = await db.execute(sql`
+
       WITH route AS (
         SELECT ST_GeomFromText(${linestring}, 4326) as geom
       ),
       service_stations AS (
-        SELECT 
+        SELECT
           l.id,
           l.external_id,
           l.name,
           l.type,
           ST_X(l.location::geometry) as longitude,
           ST_Y(l.location::geometry) as latitude,
-          ST_LineLocatePoint(route.geom, l.location::geometry) * 
+          ST_LineLocatePoint(route.geom, l.location::geometry) *
             ST_Length(route.geom::geography) as distance_along_route,
-          ST_Distance(l.location::geometry::geography, route.geom::geography) 
+          ST_Distance(l.location::geometry::geography, route.geom::geography)
             as distance_from_route,
           e.${fuelColumn} as fuel_price,
           NULL::jsonb as ev_data
@@ -204,16 +205,16 @@ export async function getAllPOIs(
         AND e.${fuelColumn} IS NOT NULL
       ),
       ev_points AS (
-  SELECT 
+  SELECT
     l.id,
     l.external_id,
     l.name,
     l.type,
     ST_X(l.location::geometry) as longitude,
     ST_Y(l.location::geometry) as latitude,
-    ST_LineLocatePoint(route.geom, l.location::geometry) * 
+    ST_LineLocatePoint(route.geom, l.location::geometry) *
       ST_Length(route.geom::geography) as distance_along_route,
-    ST_Distance(l.location::geometry::geography, route.geom::geography) 
+    ST_Distance(l.location::geometry::geography, route.geom::geography)
       as distance_from_route,
     NULL::numeric as fuel_price,
     jsonb_build_object(
@@ -234,7 +235,7 @@ export async function getAllPOIs(
   WHERE ST_DWithin(l.location::geometry::geography, route.geom::geography, ${radius})
   AND l.type = 'ev_charging_point'
   AND ct.connection_type = ${connection_type}
-  GROUP BY 
+  GROUP BY
     l.id,
     l.name,
     l.type,
@@ -251,36 +252,38 @@ export async function getAllPOIs(
       ORDER BY distance_along_route ASC;
     `);
 
-	return pois.rows.map(
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		(poi: any) => {
-			const base = {
-				id: poi.id.toString(),
-				location_id: poi.external_id,
-				name: poi.name,
-				coordinates: [poi.latitude, poi.longitude] as [number, number],
-				distance: Math.round(poi.distance_from_route),
-				distanceAlongRoute: Math.round(poi.distance_along_route),
-				side: "unknown" as const,
-			};
+  console.log("All POIs:", pois);
 
-			if (poi.type === "service_station") {
-				return {
-					...base,
-					type: "service_station" as const,
-					fuel_price: poi.fuel_price ? Number(poi.fuel_price) : null,
-				};
-			}
-			const evData = poi.ev_data;
-			return {
-				...base,
-				type: "ev_charging_point" as const,
-				operator: evData.operator,
-				usage_cost: evData.usage_cost,
-				access_type: evData.access_type,
-				is_operational: evData.is_operational,
-				connections: evData.connections,
-			};
-		},
-	);
+  return pois.rows.map(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    (poi: any) => {
+      const base = {
+        id: poi.id.toString(),
+        location_id: poi.external_id,
+        name: poi.name,
+        coordinates: [poi.latitude, poi.longitude] as [number, number],
+        distance: Math.round(poi.distance_from_route),
+        distanceAlongRoute: Math.round(poi.distance_along_route),
+        side: "unknown" as const
+      };
+
+      if (poi.type === "service_station") {
+        return {
+          ...base,
+          type: "service_station" as const,
+          fuel_price: poi.fuel_price ? Number(poi.fuel_price) : null
+        };
+      }
+      const evData = poi.ev_data;
+      return {
+        ...base,
+        type: "ev_charging_point" as const,
+        operator: evData.operator,
+        usage_cost: evData.usage_cost,
+        access_type: evData.access_type,
+        is_operational: evData.is_operational,
+        connections: evData.connections
+      };
+    }
+  );
 }
