@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
 
-module.exports = {
+const nextConfig: NextConfig = {
   experimental: {
+    // Add valid experimental options here if needed
+    //@ts-expect-error
     missingSuspenseWithCSRBailout: false
   }
-};
-
-const nextConfig: NextConfig = {
   /* config options here */
 };
 
