@@ -28,15 +28,13 @@ const MapContainer = memo(function MapContainer({
   setSelectedPOI
 }: MapContainerProps) {
   return (
-    <div className="w-full md:w-2/3 h-full">
-      <MapComponent
-        route={route}
-        stations={stations}
-        showRightSideOnly={showRightSideOnly}
-        selectedStation={selectedStation}
-        setSelectedPOI={setSelectedPOI}
-      />
-    </div>
+    <MapComponent
+      route={route}
+      stations={stations}
+      showRightSideOnly={showRightSideOnly}
+      selectedStation={selectedStation}
+      setSelectedPOI={setSelectedPOI}
+    />
   );
 });
 
