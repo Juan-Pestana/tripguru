@@ -3,17 +3,14 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Navigation } from "lucide-react";
-import { LocationInput } from "@/components/LocationInputs";
-import { POITypeSelector } from "@/components/POITypeSelector";
+import { CardContent } from "@/components/ui/card";
+
 import { Spinner } from "@/components/ui/spinner";
 import { POIList } from "@/components/POIList";
 import { RouteInfo } from "@/components/RouteInfo";
 import { useRoute } from "@/hooks/useRoute";
 import { usePOIs } from "@/hooks/usePOIs";
-import { type Coordinates, type POIType, RouteData } from "@/types/types";
+import { POIType } from "@/types/types";
 import { reverseGeocode } from "@/lib/utils";
 import MapContainer from "@/components/MapContainer";
 import { Map, List } from "lucide-react";
@@ -54,23 +51,6 @@ export default function Search() {
 
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
 
-  // const [stateorigin, setOrigin] = useState(origin);
-  // const [statedestination, setDestination] = useState(destination);
-  // const [stateCurrentLocation, setCurrentLocation] =
-  //   useState<Coordinates | null>(currentLocation);
-  // const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
-  // const [error, setError] = useState<string | null>(null);
-
-  // // POI selection state
-  // const [stateselectedPOITypes, setSelectedPOITypes] = useState<Set<POIType>>(
-  //   selectedPOITypes || new Set(["service_station"])
-  // );
-  // const [statefuelType, setFuelType] = useState(fuelType || "gasoleo_a");
-  // const [stateconnectionType, setConnectionType] = useState(
-  //   connectionType || "CCS (Type 2)"
-  // );
-  //const [isLoading, setIsLoading] = useState(false);
-
   const {
     route,
     isLoading: isLoadingRoute,
@@ -105,60 +85,6 @@ export default function Search() {
     !!route // enabled only if route exists
   );
 
-  // // Location handling
-  // const handleGetCurrentLocation = async () => {
-  //   setIsLoadingLocation(true);
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         const { latitude, longitude } = position.coords;
-  //         setCurrentLocation({ lat: latitude, lng: longitude });
-
-  //         // Convert coordinates to address using reverse geocoding
-  //         reverseGeocode(latitude, longitude)
-  //           .then((address) => {
-  //             //setOrigin(address);
-  //             setIsLoadingLocation(false);
-  //           })
-  //           .catch((err) => {
-  //             console.error("Reverse geocoding error:", err);
-  //             setOrigin(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-  //             setIsLoadingLocation(false);
-  //           });
-  //       },
-  //       (error) => {
-  //         console.error("Geolocation error:", error);
-  //         setError(
-  //           "Could not get your current location. Please allow location access."
-  //         );
-  //         setIsLoadingLocation(false);
-  //       }
-  //     );
-  //   } else {
-  //     setError("Geolocation is not supported by your browser.");
-  //     setIsLoadingLocation(false);
-  //   }
-  // };
-
-  // // Search handling
-  // const handleSearch = () => {
-  //   if ((!stateorigin && !stateCurrentLocation) || !statedestination) return;
-
-  //   const params = new URLSearchParams();
-  //   params.set("origin", stateorigin);
-  //   params.set("destination", statedestination);
-  //   if (stateCurrentLocation) {
-  //     params.set("lat", stateCurrentLocation.lat.toString());
-  //     params.set("lng", stateCurrentLocation.lng.toString());
-  //   }
-  //   params.set("fuelType", statefuelType);
-  //   params.set("connectionType", stateconnectionType);
-  //   params.set("selectedTypes", Array.from(stateselectedPOITypes).join(","));
-
-  //   router.push(`/results?${params.toString()}`);
-  //   console.log("Search params updated:", params.toString());
-  // };
-
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* 3. Mobile top banner */}
@@ -188,40 +114,7 @@ export default function Search() {
           md:block
         `}
       >
-        {/* <CardHeader>
-          <CardTitle>Route & Service Stations</CardTitle>
-        </CardHeader> */}
         <CardContent className="space-y-6 p-2">
-          {/* <LocationInput
-            origin={stateorigin}
-            destination={statedestination}
-            currentLocation={stateCurrentLocation}
-            isLoadingLocation={isLoadingLocation}
-            onOriginChange={setOrigin}
-            onDestinationChange={setDestination}
-            onGetCurrentLocation={handleGetCurrentLocation}
-          />
-
-          <POITypeSelector
-            selectedTypes={stateselectedPOITypes}
-            onTypeChange={setSelectedPOITypes}
-            fuelType={statefuelType}
-            connectionType={stateconnectionType}
-            onFuelTypeChange={setFuelType}
-            onConnectionTypeChange={setConnectionType}
-          />
-
-          <Button
-            onClick={handleSearch}
-            className="w-full"
-            disabled={
-              (!stateorigin && !stateCurrentLocation) || !statedestination
-            }
-          >
-            <Navigation className="mr-2" size={18} />
-            Find Route and Stations
-          </Button> */}
-
           {route && (
             <RouteInfo
               route={route}
