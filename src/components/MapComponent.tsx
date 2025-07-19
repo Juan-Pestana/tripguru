@@ -18,6 +18,7 @@ import type { POI } from "@/types/types";
 
 import PopupComponent from "./PopupComponent";
 import L from "leaflet";
+import { set } from "zod";
 
 // Dynamically import Leaflet components with no SSR
 const MapContainer = dynamic(
@@ -78,6 +79,7 @@ interface MapComponentProps {
   stations: POI[];
   showRightSideOnly: boolean;
   selectedStation: string | null;
+  setSelectedPOI: (poiId: string | null) => void;
 }
 
 // Map Bounds Adjuster component to auto-fit map to route
@@ -108,7 +110,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   route,
   stations,
   showRightSideOnly,
-  selectedStation
+  selectedStation,
+  setSelectedPOI
 }) => {
   const [isClient, setIsClient] = useState(false);
   const [markers, setMarkers] = useState<{ [key: string]: L.Marker | null }>(
@@ -128,30 +131,33 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     const fetchStationDetails = async () => {
+      console.log("Fetching station details for:", selectedStation);
       // Reset station details and close popup immediately
       setStationDetails(null);
       if (currentOpenPopup.current) {
         currentOpenPopup.current.closePopup();
       }
-
       if (selectedStation && markers[selectedStation] && mapRef.current) {
         const marker = markers[selectedStation];
+
         const position = marker?.getLatLng();
+
         const stationsel = stations.find(
           (station) => station.id === selectedStation
         );
 
         if (stationsel?.type === "service_station") {
           const details = await getStationDetails(stationsel.location_id);
+          console.log("Fetched station details:", details);
           setStationDetails(details as StationDetails & EVStationDetails);
         } else if (stationsel?.type === "ev_charging_point") {
           const details = await getEVStationDetails(stationsel.location_id);
           setStationDetails(details as StationDetails & EVStationDetails);
         }
 
-        if (position && marker) {
-          mapRef.current.flyTo(position, 15);
+        if (position && marker && stationDetails) {
           marker.openPopup();
+          mapRef.current.flyTo(position, 15);
           currentOpenPopup.current = marker;
         }
       }
@@ -196,6 +202,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
           key={station.id}
           position={[station.coordinates[0], station.coordinates[1]]}
           icon={station.side === "right" ? rightSideIcon : leftSideIcon}
+          eventHandlers={{
+            click: () => {
+              console.log("Marker clicked:", station.location_id);
+              setSelectedPOI(station.id);
+            }
+          }}
           ref={(ref) => {
             if (ref) {
               markers[station.id] = ref;

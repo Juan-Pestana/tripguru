@@ -94,7 +94,7 @@ export function usePOIs(
     filteredPois,
     selectedPOI,
     showRightSideOnly,
-    error: error?.message ?? null,
+    error,
     isLoading,
     setShowRightSideOnly: updateFilter,
     setSelectedPOI,

@@ -1,6 +1,7 @@
 import { memo } from "react";
 import dynamic from "next/dynamic";
 import type { POI } from "@/types/types";
+import { set } from "zod";
 
 const MapComponent = dynamic(() => import("@/components/MapComponent"), {
   ssr: false,
@@ -16,21 +17,24 @@ interface MapContainerProps {
   stations: POI[];
   showRightSideOnly: boolean;
   selectedStation: string | null;
+  setSelectedPOI: (poiId: string | null) => void;
 }
 
 const MapContainer = memo(function MapContainer({
   route,
   stations,
   showRightSideOnly,
-  selectedStation
+  selectedStation,
+  setSelectedPOI
 }: MapContainerProps) {
   return (
-    <div className="w-full md:w-2/3 h-64 md:h-full">
+    <div className="w-full md:w-2/3 h-full">
       <MapComponent
         route={route}
         stations={stations}
         showRightSideOnly={showRightSideOnly}
         selectedStation={selectedStation}
+        setSelectedPOI={setSelectedPOI}
       />
     </div>
   );
