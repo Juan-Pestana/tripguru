@@ -2,6 +2,7 @@ import { memo } from "react";
 import dynamic from "next/dynamic";
 import type { POI } from "@/types/types";
 import { set } from "zod";
+import { is } from "drizzle-orm";
 
 const MapComponent = dynamic(() => import("@/components/MapComponent"), {
   ssr: false,
@@ -18,6 +19,7 @@ interface MapContainerProps {
   showRightSideOnly: boolean;
   selectedStation: string | null;
   setSelectedPOI: (poiId: string | null) => void;
+  isVisible: boolean;
 }
 
 const MapContainer = memo(function MapContainer({
@@ -25,11 +27,13 @@ const MapContainer = memo(function MapContainer({
   stations,
   showRightSideOnly,
   selectedStation,
-  setSelectedPOI
+  setSelectedPOI,
+  isVisible
 }: MapContainerProps) {
   return (
     <MapComponent
       route={route}
+      isVisible={isVisible}
       stations={stations}
       showRightSideOnly={showRightSideOnly}
       selectedStation={selectedStation}

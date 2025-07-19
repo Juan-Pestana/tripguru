@@ -77,6 +77,7 @@ const createServiceStationIcon = (isRightSide: boolean) => {
 interface MapComponentProps {
   route: [number, number][] | undefined;
   stations: POI[];
+  isVisible: boolean;
   showRightSideOnly: boolean;
   selectedStation: string | null;
   setSelectedPOI: (poiId: string | null) => void;
@@ -86,11 +87,13 @@ interface MapComponentProps {
 const MapBoundsAdjuster: React.FC<{
   route: [number, number][] | undefined;
   stations: POI[];
+  isVisible: boolean;
 }> = ({ route, stations }) => {
   const map = useMap();
 
   useEffect(() => {
     if (route && route.length > 0) {
+      map.invalidateSize();
       const bounds = L.latLngBounds(route.map((coord) => [coord[0], coord[1]]));
 
       // Add station locations to bounds
@@ -111,6 +114,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   stations,
   showRightSideOnly,
   selectedStation,
+  isVisible,
   setSelectedPOI
 }) => {
   const [isClient, setIsClient] = useState(false);
@@ -228,7 +232,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
       ))}
 
       {/* Auto-adjust map bounds */}
-      <MapBoundsAdjuster route={route} stations={stations} />
+      <MapBoundsAdjuster
+        route={route}
+        stations={stations}
+        isVisible={isVisible}
+      />
     </MapContainer>
   );
 };

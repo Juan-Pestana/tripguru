@@ -289,6 +289,7 @@ export default function Search() {
                   : "unknown"
           }))}
           setSelectedPOI={setSelectedPOI}
+          isVisible={mobileView === "map"}
           showRightSideOnly={showRightSideOnly}
           selectedStation={selectedPOI}
         />
