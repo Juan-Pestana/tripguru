@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { POI } from "@/types/types";
 //import { fetchPOIs } from "./useFetchPOIs"; // Move your fetchPOIs function to a separate file if needed
 import { isStationOnRightSide } from "@/lib/utils";
+import { getEVStationDetails, getStationDetails } from "@/actions/getPoyById";
 
 interface FetchPOIsOptions {
   selectedTypes: Set<string>;
@@ -89,6 +90,40 @@ export function usePOIs(
     setShowRightSideOnly(showRightOnly);
   };
 
+  const selectedPOIObject = useMemo(
+    () => processedPois.find((poi) => poi.id === selectedPOI) || null,
+    [processedPois, selectedPOI]
+  );
+
+  // Query for POI details by locationId
+  const {
+    data: selectedPOIDetails,
+    error: selectedPOIDetailsError,
+    isLoading: isLoadingSelectedPOIDetails,
+    refetch: refetchSelectedPOIDetails
+  } = useQuery({
+    queryKey: [
+      "poi-details",
+      selectedPOIObject?.location_id,
+      selectedPOIObject?.type
+    ],
+    queryFn: async () => {
+      if (!selectedPOIObject) return null;
+      if (selectedPOIObject.type === "service_station") {
+        const details = await getStationDetails(selectedPOIObject.location_id);
+        return { ...selectedPOIObject, details: { ...details } };
+      } else if (selectedPOIObject.type === "ev_charging_point") {
+        const details = await getEVStationDetails(
+          selectedPOIObject.location_id
+        );
+        return { ...selectedPOIObject, details: { ...details } };
+      }
+      return null;
+    },
+    enabled: !!selectedPOIObject?.location_id,
+    staleTime: 1000 * 60 * 5
+  });
+
   return {
     pois: processedPois,
     filteredPois,
@@ -98,6 +133,10 @@ export function usePOIs(
     isLoading,
     setShowRightSideOnly: updateFilter,
     setSelectedPOI,
-    refetch
+    refetch,
+    selectedPOIDetails,
+    selectedPOIDetailsError,
+    isLoadingSelectedPOIDetails,
+    refetchSelectedPOIDetails
   };
 }

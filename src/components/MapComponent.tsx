@@ -137,7 +137,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     const fetchStationDetails = async () => {
       console.log("Fetching station details for:", selectedStation);
       // Reset station details and close popup immediately
-      setStationDetails(null);
+      //setStationDetails(null);
       if (currentOpenPopup.current) {
         currentOpenPopup.current.closePopup();
       }
@@ -150,17 +150,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
           (station) => station.id === selectedStation
         );
 
-        if (stationsel?.type === "service_station") {
-          const details = await getStationDetails(stationsel.location_id);
-          console.log("Fetched station details:", details);
-          setStationDetails(details as StationDetails & EVStationDetails);
-        } else if (stationsel?.type === "ev_charging_point") {
-          const details = await getEVStationDetails(stationsel.location_id);
-          setStationDetails(details as StationDetails & EVStationDetails);
-        }
+        // if (stationsel?.type === "service_station") {
+        //   const details = await getStationDetails(stationsel.location_id);
+        //   console.log("Fetched station details:", details);
+        //   setStationDetails(details as StationDetails & EVStationDetails);
+        // } else if (stationsel?.type === "ev_charging_point") {
+        //   const details = await getEVStationDetails(stationsel.location_id);
+        //   setStationDetails(details as StationDetails & EVStationDetails);
+        // }
 
         if (position && marker && stationDetails) {
-          marker.openPopup();
+          //marker.openPopup();
           mapRef.current.flyTo(position, 15);
           currentOpenPopup.current = marker;
         }
@@ -218,7 +218,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             }
           }}
         >
-          <Popup className="w-[390px] p-1">
+          {/* <Popup className="w-[390px] p-1">
             {stationDetails && (
               <PopupComponent
                 station={{
@@ -227,7 +227,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 }}
               />
             )}
-          </Popup>
+          </Popup> */}
         </Marker>
       ))}
 

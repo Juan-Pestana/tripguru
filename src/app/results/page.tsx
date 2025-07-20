@@ -14,6 +14,7 @@ import { POIType } from "@/types/types";
 import { reverseGeocode } from "@/lib/utils";
 import MapContainer from "@/components/MapContainer";
 import { Map, List } from "lucide-react";
+import { DrawerDialogDemo } from "@/components/DrawerDialog";
 
 // Dynamically import the Map component to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/MapComponent"), {
@@ -73,7 +74,11 @@ export default function Search() {
     isLoading: isLoadingPois,
     setShowRightSideOnly,
     setSelectedPOI,
-    refetch
+    refetch,
+    selectedPOIDetails,
+    selectedPOIDetailsError,
+    isLoadingSelectedPOIDetails,
+    refetchSelectedPOIDetails
   } = usePOIs(
     route?.coordinates,
     {
@@ -187,6 +192,15 @@ export default function Search() {
           selectedStation={selectedPOI}
         />
       </div>
+      <DrawerDialogDemo
+        open={!!selectedPOI}
+        onOpenChange={(open) => {
+          if (!open) setSelectedPOI(null);
+        }}
+        station={selectedPOIDetails}
+        isLoading={isLoadingSelectedPOIDetails}
+        error={selectedPOIDetailsError}
+      />
     </div>
   );
 }
