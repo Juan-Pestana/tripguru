@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { POI } from "@/types/types";
 import type { StationDetails } from "@/actions/getPoyById";
+import { MiniMap } from "@/components/MiniMap";
 
 interface ServiceStationPopupProps {
   station: POI & {
@@ -20,20 +21,10 @@ export default function ServiceStationPopup({
   // Get the POI ID from the URL
 
   return (
-    <Card className="w-[350px] relative py-2 gap-3 border-0 border-transparent shadow-transparent">
+    <Card className="mx-auto px-4 relative py-2 gap-3 border-0 border-transparent shadow-transparent">
       <CardContent className="p-2">
+        <MiniMap coordinates={station.coordinates} />
         <div className="space-y-3">
-          <div>
-            <h3 className="font-bold text-lg">{station.name}</h3>
-            <div className="flex items-center text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5 mr-1" />
-              <span className="my-2">
-                {station?.details.address}, {station?.details.city},{" "}
-                {station?.details.province}, {station?.details.postalCode}
-              </span>
-            </div>
-          </div>
-
           <div className="flex items-center">
             <Clock className="h-3.5 w-3.5 mr-1" />
             <span className="my-1">
@@ -68,12 +59,12 @@ export default function ServiceStationPopup({
             {station.details.top_categories ? (
               station.details.top_categories.map((category, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <Badge key={index} variant="secondary" className="text-xs">
+                <Badge key={index} variant="secondary" className="text-sm">
                   {category.category}
                 </Badge>
               ))
             ) : (
-              <Badge variant="info" className="text-xs ">
+              <Badge variant="info" className="text-sm ">
                 Be the first to rate this station!
               </Badge>
             )}

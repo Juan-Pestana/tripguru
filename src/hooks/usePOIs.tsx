@@ -4,6 +4,13 @@ import type { POI } from "@/types/types";
 //import { fetchPOIs } from "./useFetchPOIs"; // Move your fetchPOIs function to a separate file if needed
 import { isStationOnRightSide } from "@/lib/utils";
 import { getEVStationDetails, getStationDetails } from "@/actions/getPoyById";
+import type { EVStationDetails, StationDetails } from "@/actions/getPoyById";
+
+export type POIwDetails =
+  | (Extract<POI, { type: "service_station" }> & { details: StationDetails })
+  | (Extract<POI, { type: "ev_charging_point" }> & {
+      details: EVStationDetails;
+    });
 
 interface FetchPOIsOptions {
   selectedTypes: Set<string>;
@@ -111,12 +118,12 @@ export function usePOIs(
       if (!selectedPOIObject) return null;
       if (selectedPOIObject.type === "service_station") {
         const details = await getStationDetails(selectedPOIObject.location_id);
-        return { ...selectedPOIObject, details: { ...details } };
+        return { ...selectedPOIObject, details: { ...details } } as POIwDetails;
       } else if (selectedPOIObject.type === "ev_charging_point") {
         const details = await getEVStationDetails(
           selectedPOIObject.location_id
         );
-        return { ...selectedPOIObject, details: { ...details } };
+        return { ...selectedPOIObject, details: { ...details } } as POIwDetails;
       }
       return null;
     },

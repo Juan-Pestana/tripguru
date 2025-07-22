@@ -24,12 +24,14 @@ import {
 import { Input } from "@/components/ui/input";
 import PopupComponent from "./PopupComponent";
 import { Spinner } from "./ui/spinner";
+import { POIwDetails } from "@/hooks/usePOIs";
+import { MapPin } from "lucide-react";
 //import { Label } from "@/components/ui/label";
 
 interface DrawerDialogDemoProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  station: any; // Use the correct type for your station details
+  station?: POIwDetails | null; // Use the correct type for your station details
   isLoading: boolean;
   error: Error | null;
 }
@@ -48,13 +50,28 @@ export function DrawerDialogDemo({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>{station?.name}</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
+              {station?.details.address}, {station?.details.city},{" "}
+              {station?.type === "service_station" &&
+                `${station?.details.province}, ${station?.details.postalCode} `}
             </DialogDescription>
           </DialogHeader>
-          {station && <PopupComponent station={station} />}
+          {isLoading && (
+            <div className="flex items-center justify-center h-full">
+              <Spinner message="Loading station details..." />
+            </div>
+          )}
+          {error && (
+            <div className="text-red-500">
+              Error loading station details: {error.message}
+            </div>
+          )}
+          {station && (
+            <div className="w-full">
+              <PopupComponent station={station} />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     );
@@ -63,10 +80,12 @@ export function DrawerDialogDemo({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
+        <DrawerHeader className="text-left pb-0">
+          <DrawerTitle>{station?.name}</DrawerTitle>
           <DrawerDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
+            {station?.details.address}, {station?.details.city},{" "}
+            {station?.type === "service_station" &&
+              `${station?.details.postalCode}, ${station?.details.province}`}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -81,33 +100,11 @@ export function DrawerDialogDemo({
           </div>
         )}
         {station && (
-          <div className="mx-auto">
+          <div className="w-full">
             <PopupComponent station={station} />
           </div>
         )}
-
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  );
-}
-
-function ProfileForm({ className }: React.ComponentProps<"form">) {
-  return (
-    <form className={cn("grid items-start gap-6", className)}>
-      <div className="grid gap-3">
-        {/* <Label htmlFor="email">Email</Label> */}
-        <Input type="email" id="email" defaultValue="shadcn@example.com" />
-      </div>
-      <div className="grid gap-3">
-        {/* <Label htmlFor="username">Username</Label> */}
-        <Input id="username" defaultValue="@shadcn" />
-      </div>
-      <Button type="submit">Save changes</Button>
-    </form>
   );
 }
