@@ -16,7 +16,11 @@ const Marker = dynamic(
   { ssr: false }
 );
 
-export function MiniMap({ coordinates }: { coordinates: [number, number] }) {
+export default function MiniMap({
+  coordinates
+}: {
+  coordinates: [number, number];
+}) {
   // Fix Leaflet icon issue
   if (typeof window !== "undefined" && L.Icon.Default) {
     L.Icon.Default.mergeOptions({

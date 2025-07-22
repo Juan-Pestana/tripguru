@@ -16,6 +16,16 @@ import MapContainer from "@/components/MapContainer";
 import { Map, List } from "lucide-react";
 import { DrawerDialogDemo } from "@/components/DrawerDialog";
 
+// Dynamically import the Map component to avoid SSR issues with Leaflet
+const MapComponent = dynamic(() => import("@/components/MapComponent"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+      Loading map...
+    </div>
+  )
+});
+
 export default function Search() {
   const router = useRouter();
   const searchParams = useSearchParams();

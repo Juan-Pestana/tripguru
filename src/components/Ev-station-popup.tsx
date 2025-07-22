@@ -8,7 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import type { POI } from "@/actions/getPois2";
 import type { EVStationDetails, StationDetails } from "@/actions/getPoyById";
 import Link from "next/link";
-import { MiniMap } from "./MiniMap";
+import dynamic from "next/dynamic";
+
+// Dynamically import the Map component to avoid SSR issues with Leaflet
+const MiniMap = dynamic(() => import("@/components/MiniMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+      Loading map...
+    </div>
+  )
+});
 
 type ChargingPointType = {
   type: string;

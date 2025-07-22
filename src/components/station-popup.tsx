@@ -7,7 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { POI } from "@/types/types";
 import type { StationDetails } from "@/actions/getPoyById";
-import { MiniMap } from "@/components/MiniMap";
+import dynamic from "next/dynamic";
+//import { MiniMap } from "@/components/MiniMap";
+
+// Dynamically import the Map component to avoid SSR issues with Leaflet
+const MiniMap = dynamic(() => import("@/components/MiniMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+      Loading map...
+    </div>
+  )
+});
 
 interface ServiceStationPopupProps {
   station: POI & {
