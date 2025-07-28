@@ -87,10 +87,8 @@ export default function EVChargingStationPopup({
             </div>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">
-              Cargadores:
-            </p>
+          <div className="space-y-2 my-2">
+            <p className="text-sm text-muted-foreground">Cargadores:</p>
             <div className="bg-muted rounded-md p-2 space-y-2">
               {station.details.connections.map((point, index) => (
                 <div
@@ -121,18 +119,14 @@ export default function EVChargingStationPopup({
         </div>
       </CardContent>
 
-      <CardFooter className="flex gap-2 p-4 pt-0">
-        <Button variant="outline" size="sm" className="flex-1 text-sm">
-          <ThumbsUp className="h-3.5 w-3.5 mr-1" />
-          Valorar estación
-        </Button>
+      <CardFooter className="flex gap-2 p-4 pt-0 px-0">
         <Link
-          className="flex-1"
+          className="w-full"
           target="_blank"
           rel="noopener noreferrer"
           href={`https://www.google.com/maps/dir/?api=1&destination=${station.coordinates[0]},${station.coordinates[1]}`}
         >
-          <Button size="sm" className="w-full text-sm cursor-pointer">
+          <Button size="sm" className="w-full text-md cursor-pointer">
             <Navigation className="h-3.5 w-3.5 mr-1" />
             Llegar
           </Button>

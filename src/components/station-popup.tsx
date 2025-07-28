@@ -75,33 +75,33 @@ export default function ServiceStationPopup({
                 </Badge>
               ))
             ) : (
-              <Badge variant="info" className="text-sm ">
-                Be the first to rate this station!
+              <Badge variant="info" className="text-md ">
+                Se el primero en valorar esta estación !
               </Badge>
             )}
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="flex gap-2 p-4 pt-0">
-        <Link href={`/rank/${station.location_id}`} className="flex-1">
+      <CardFooter className="flex flex-col gap-3 py-4 px-0 pt-0 ">
+        <Link href={`/rank/${station.location_id}`} className="block w-full">
           <Button
             variant="outline"
             size="sm"
-            className="w-full text-sm cursor-pointer"
+            className="w-full text-md cursor-pointer"
           >
             <ThumbsUp className="h-3.5 w-3.5 mr-1" />
-            Vota esta estación
+            Valora esta estación
           </Button>
         </Link>
 
         <Link
-          className="flex-1"
+          className="block w-full"
           target="_blank"
           rel="noopener noreferrer"
           href={`https://www.google.com/maps/dir/?api=1&destination=${station.coordinates[0]},${station.coordinates[1]}`}
         >
-          <Button size="sm" className="w-full text-sm cursor-pointer">
+          <Button size="sm" className="w-full text-md cursor-pointer">
             <Navigation className="h-3.5 w-3.5 mr-1" />
             Llegar
           </Button>
