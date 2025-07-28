@@ -5,59 +5,62 @@ import { station_ratings, station_categories } from "@/db/schema";
 import { sql } from "drizzle-orm";
 
 interface RateStationInput {
-	locationId: string;
-	rating: number;
-	primaryCategory: string;
-	secondaryCategory?: string;
-	appreciation?: string;
-	recommendation?: string;
+  locationId: string;
+  rating: number;
+  primaryCategory: string;
+  secondaryCategory?: string;
+  appreciation?: string;
+  recommendation?: string;
 }
 
 export async function rateStation({
-	locationId,
-	rating,
-	primaryCategory,
-	secondaryCategory,
-	appreciation,
-	recommendation,
+  locationId,
+  rating,
+  primaryCategory,
+  secondaryCategory,
+  appreciation,
+  recommendation
 }: RateStationInput): Promise<{ success: boolean; error?: string }> {
-	try {
-		// Start a transaction
-		return await db.transaction(async (tx) => {
-			// Insert the rating
-			const [ratingResult] = await tx
-				.insert(station_ratings)
-				.values({
-					location_id: locationId,
-					rating: sql`${rating}::numeric`,
-					appreciation: appreciation || null,
-					recommendation: recommendation || null,
-				})
-				.returning({ id: station_ratings.id });
+  try {
+    // Insert the rating
+    const [ratingResult] = await db
+      .insert(station_ratings)
+      .values({
+        location_id: locationId,
+        rating: sql`${rating}::numeric`,
+        appreciation: appreciation || null,
+        recommendation: recommendation || null
+      })
+      .returning({ id: station_ratings.id });
 
-			// Insert primary category
-			await tx.insert(station_categories).values({
-				rating_id: ratingResult.id,
-				category: primaryCategory,
-				is_primary: true,
-			});
+    // Throw an error if the rating insert fails
+    if (!ratingResult?.id) {
+      throw new Error("Failed to insert rating into station_ratings.");
+    }
 
-			// Insert secondary category if provided
-			if (secondaryCategory) {
-				await tx.insert(station_categories).values({
-					rating_id: ratingResult.id,
-					category: secondaryCategory,
-					is_primary: false,
-				});
-			}
+    // Insert primary category
+    await db.insert(station_categories).values({
+      rating_id: ratingResult.id,
+      category: primaryCategory,
+      is_primary: true
+    });
 
-			return { success: true };
-		});
-	} catch (error) {
-		console.error("Error rating station:", error);
-		return {
-			success: false,
-			error: "Failed to submit rating. Please try again.",
-		};
-	}
+    // Insert secondary category if provided
+    if (secondaryCategory) {
+      await db.insert(station_categories).values({
+        rating_id: ratingResult.id,
+        category: secondaryCategory,
+        is_primary: false
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    // Log the error and return a failure response
+    console.error("Error rating station:", error);
+    return {
+      success: false,
+      error: "Failed to submit rating. Please try again."
+    };
+  }
 }

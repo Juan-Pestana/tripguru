@@ -14,13 +14,12 @@ export function POIList({
   onPOIClick,
   onFilterChange
 }: POIListProps) {
-  console.log("POIList rendered with pois:", pois);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-bold">
           {showRightSideOnly
-            ? "Estaciones (a la derecha)"
+            ? "Estaciones a la derecha"
             : "Todas las estaciones"}
         </h3>
         <div className="flex items-center space-x-2">

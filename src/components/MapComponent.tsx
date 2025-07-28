@@ -1,11 +1,9 @@
 "use client";
 // components/MapComponent.tsx
-import { Suspense, useEffect, useRef, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
 import {
   type EVStationDetails,
-  getEVStationDetails,
-  getStationDetails,
   type StationDetails
 } from "@/actions/getPoyById";
 //import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
@@ -16,9 +14,7 @@ import "leaflet/dist/leaflet.css";
 
 import type { POI } from "@/types/types";
 
-import PopupComponent from "./PopupComponent";
 import L from "leaflet";
-import { set } from "zod";
 
 // Dynamically import Leaflet components with no SSR
 const MapContainer = dynamic(
@@ -88,10 +84,14 @@ const MapBoundsAdjuster: React.FC<{
   route: [number, number][] | undefined;
   stations: POI[];
   isVisible: boolean;
-}> = ({ route, stations }) => {
+  selectedStation: string | null;
+}> = ({ route, stations, selectedStation }) => {
   const map = useMap();
 
   useEffect(() => {
+    // Skip adjusting bounds if a station is selected
+    if (selectedStation) return;
+
     if (route && route.length > 0) {
       map.invalidateSize();
       const bounds = L.latLngBounds(route.map((coord) => [coord[0], coord[1]]));
@@ -126,48 +126,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
     (StationDetails & EVStationDetails) | null
   >(null);
   const mapRef = useRef<L.Map | null>(null);
-  const currentOpenPopup = useRef<L.Marker | null>(null);
+  //const currentOpenPopup = useRef<L.Marker | null>(null);
 
   useEffect(() => {
     setIsClient(true);
     fixLeafletIcon();
   }, []);
-
-  useEffect(() => {
-    const fetchStationDetails = async () => {
-      console.log("Fetching station details for:", selectedStation);
-      // Reset station details and close popup immediately
-      //setStationDetails(null);
-      if (currentOpenPopup.current) {
-        currentOpenPopup.current.closePopup();
-      }
-      if (selectedStation && markers[selectedStation] && mapRef.current) {
-        const marker = markers[selectedStation];
-
-        const position = marker?.getLatLng();
-
-        const stationsel = stations.find(
-          (station) => station.id === selectedStation
-        );
-
-        // if (stationsel?.type === "service_station") {
-        //   const details = await getStationDetails(stationsel.location_id);
-        //   console.log("Fetched station details:", details);
-        //   setStationDetails(details as StationDetails & EVStationDetails);
-        // } else if (stationsel?.type === "ev_charging_point") {
-        //   const details = await getEVStationDetails(stationsel.location_id);
-        //   setStationDetails(details as StationDetails & EVStationDetails);
-        // }
-
-        if (position && marker && stationDetails) {
-          //marker.openPopup();
-          mapRef.current.flyTo(position, 15);
-          currentOpenPopup.current = marker;
-        }
-      }
-    };
-    fetchStationDetails();
-  }, [selectedStation, markers, stations]);
 
   if (!isClient) return <div>Loading map...</div>;
 
@@ -217,22 +181,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
               markers[station.id] = ref;
             }
           }}
-        >
-          {/* <Popup className="w-[390px] p-1">
-            {stationDetails && (
-              <PopupComponent
-                station={{
-                  ...station,
-                  details: stationDetails as StationDetails & EVStationDetails
-                }}
-              />
-            )}
-          </Popup> */}
-        </Marker>
+        ></Marker>
       ))}
 
       {/* Auto-adjust map bounds */}
       <MapBoundsAdjuster
+        selectedStation={selectedStation}
         route={route}
         stations={stations}
         isVisible={isVisible}
