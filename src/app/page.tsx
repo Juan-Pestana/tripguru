@@ -99,7 +99,7 @@ export default function Search() {
                 <h1 className="text-3xl font-bold">TripGuru</h1>
               </div>
               <h2 className="text-4xl font-bold mb-4 leading-tight">
-                Encuentra la ruta perfecta
+                Encuentra la parada perfecta
               </h2>
               <p className="text-xl text-blue-100 leading-relaxed">
                 Descubre estaciones de servicio y puntos de recarga en tu
