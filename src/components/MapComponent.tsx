@@ -205,7 +205,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <Marker
           key={station.id}
           position={[station.coordinates[0], station.coordinates[1]]}
-          icon={station.side === "right" ? rightSideIcon : leftSideIcon}
+          icon={station.side === "derecho" ? rightSideIcon : leftSideIcon}
           eventHandlers={{
             click: () => {
               console.log("Marker clicked:", station.location_id);
