@@ -5,7 +5,7 @@ import { getChargingTypeIcon } from "@/lib/componentUtils";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { POI } from "@/actions/getPois2";
+import type { POI } from "@/types/types";
 import type { EVStationDetails, StationDetails } from "@/actions/getPoyById";
 import Link from "next/link";
 import dynamic from "next/dynamic";
