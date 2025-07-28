@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Fuel, MapPin, Navigation, Zap } from "lucide-react";
+import { Fuel, MapPin, Navigation, Zap, PanelRightClose } from "lucide-react";
 import Image from "next/image";
-import type { POI } from "@/actions/getPois2";
+import type { POI } from "@/types/types";
 
 interface ServiceStationCardProps {
   station: POI;
@@ -33,10 +33,10 @@ export function ServiceStationCard({
           </div>
 
           <Badge
-            variant={station.side === "right" ? "default" : "secondary"}
+            variant={station.side === "derecho" ? "default" : "secondary"}
             className="capitalize"
           >
-            {station.side} side
+            Lado {station.side}
           </Badge>
         </div>
 
@@ -44,14 +44,16 @@ export function ServiceStationCard({
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Navigation className="h-4 w-4" />
-              <span className="text-sm">{station.distance}m from road</span>
+              <PanelRightClose className="h-4 w-4" />
+              <span className="text-sm">
+                {station.distance}m de la carretera
+              </span>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="h-4 w-4" />
               <span>
-                {(station.distanceAlongRoute / 1000).toFixed(1)} km from start
+                {(station.distanceAlongRoute / 1000).toFixed(0)} km de distancia
               </span>
             </div>
           </div>
@@ -83,7 +85,7 @@ export function ServiceStationCard({
 
             {/* Price */}
             <div className="space-y-1">
-              <span className="text-xs text-muted-foreground">Price</span>
+              <span className="text-xs text-muted-foreground">Precio</span>
               <p className="text-lg font-semibold text-green-600">
                 {station.type === "service_station"
                   ? `€${station.fuel_price}`

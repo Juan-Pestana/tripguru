@@ -89,6 +89,7 @@ export default function Search() {
     },
     !!route // enabled only if route exists
   );
+  console.log("Filtered POIs:", filteredPois);
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
@@ -102,7 +103,7 @@ export default function Search() {
           <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7" />
           </svg>
-          <span className="ml-1">Back to search</span>
+          <span className="ml-1">Nueva búsqueda</span>
         </button>
         <button
           className="p-2"
@@ -154,11 +155,11 @@ export default function Search() {
               pois={filteredPois.map((poi) => ({
                 ...poi,
                 side:
-                  poi.side === "right" ||
-                  poi.side === "left" ||
-                  poi.side === "unknown"
+                  poi.side === "derecho" ||
+                  poi.side === "izquierdo" ||
+                  poi.side === "desconocido"
                     ? poi.side
-                    : "unknown"
+                    : "desconocido"
               }))}
               showRightSideOnly={showRightSideOnly}
               onPOIClick={setSelectedPOI}
@@ -180,11 +181,11 @@ export default function Search() {
           stations={filteredPois.map((poi) => ({
             ...poi,
             side:
-              poi.side === "right"
-                ? "right"
-                : poi.side === "left"
-                  ? "left"
-                  : "unknown"
+              poi.side === "derecho"
+                ? "derecho"
+                : poi.side === "izquierdo"
+                  ? "izquierdo"
+                  : "desconocido"
           }))}
           setSelectedPOI={setSelectedPOI}
           isVisible={mobileView === "map"}

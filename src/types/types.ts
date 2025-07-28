@@ -107,7 +107,7 @@ interface BasePOI {
   coordinates: [number, number];
   distance: number;
   distanceAlongRoute: number;
-  side: "left" | "right" | "unknown";
+  side: "derecho" | "izquierdo" | "desconocido";
 }
 
 export interface ServiceStationPOI extends BasePOI {

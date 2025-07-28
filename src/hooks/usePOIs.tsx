@@ -78,8 +78,8 @@ export function usePOIs(
       pois.map((poi) => ({
         ...poi,
         side: isStationOnRightSide(routeCoordinates ?? [], poi.coordinates)
-          ? "right"
-          : "left"
+          ? "derecho"
+          : "izquierdo"
       })),
     [pois, routeCoordinates]
   );
@@ -88,7 +88,7 @@ export function usePOIs(
   const filteredPois = useMemo(
     () =>
       showRightSideOnly
-        ? processedPois.filter((poi) => poi.side === "right")
+        ? processedPois.filter((poi) => poi.side === "derecho")
         : processedPois,
     [processedPois, showRightSideOnly]
   );

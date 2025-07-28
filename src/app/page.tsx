@@ -81,13 +81,15 @@ export default function Search() {
   };
 
   return (
-    <main className="flex items-center justify-center h-screen p-4">
+    <main className="flex items-center justify-center h-screen p-2">
       <div className="my-auto">
         <Card className="w-full p-4 overflow-auto h-full">
           <CardHeader>
-            <CardTitle>Route & Service Stations</CardTitle>
+            <CardTitle className="text-lg">
+              Ruta y estaciones de servicio
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 px-2">
             <LocationInput
               origin={stateorigin}
               destination={statedestination}
@@ -115,7 +117,7 @@ export default function Search() {
               }
             >
               <Navigation className="mr-2" size={18} />
-              Find Route and Stations
+              Buscar estaciones en ruta
             </Button>
           </CardContent>
         </Card>

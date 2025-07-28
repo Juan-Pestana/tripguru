@@ -26,7 +26,7 @@ export function LocationInput({
     <div className="space-y-4">
       <div className="flex space-x-2">
         <Input
-          placeholder="Enter Origin City"
+          placeholder="Ciudad de origen"
           value={origin}
           onChange={(e) => onOriginChange(e.target.value)}
           className="flex-grow"
@@ -43,7 +43,7 @@ export function LocationInput({
       </div>
       <div className="flex space-x-2">
         <Input
-          placeholder="Enter Destination City"
+          placeholder="Ciudad de destino"
           value={destination}
           onChange={(e) => onDestinationChange(e.target.value)}
         />
