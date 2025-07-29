@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import QueryProvider from "@/components/providers/queryProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 import { Suspense } from "react";
@@ -34,6 +35,7 @@ export default function RootLayout({
         <QueryProvider>
           <Suspense>{children}</Suspense>
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   );
