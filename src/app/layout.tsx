@@ -16,8 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "mai-trip",
-  description: "Find Service Stations and EV Charging Points along your route"
+  title: "TripGuru",
+  description:
+    "Descubre estaciones de servicio y puntos de recarga en tu camino. Planifica tu viaje con confianza."
 };
 
 export default function RootLayout({
