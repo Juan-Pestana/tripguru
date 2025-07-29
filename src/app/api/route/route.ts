@@ -38,6 +38,9 @@ export async function POST(req: NextRequest) {
     const geocodeResponse = await fetch(
       `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(address)}`
     );
+    if (!geocodeResponse.ok) {
+      throw new Error("Failed to geocode address");
+    }
     const geocodeData = await geocodeResponse.json();
 
     if (geocodeData.features && geocodeData.features.length > 0) {
@@ -47,12 +50,12 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    // Get coordinates
+    // Get coordinates, little hack to get spain coordinates
     const [originCoords, destCoords] = await Promise.all([
       currentLocation
         ? [currentLocation.lng, currentLocation.lat]
-        : await getCoordinates(origin),
-      await getCoordinates(destination)
+        : await getCoordinates(`${origin}, Spain`),
+      await getCoordinates(`${destination}, Spain`)
     ]);
 
     // Fetch route

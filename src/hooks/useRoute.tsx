@@ -1,8 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { getRoute, type routeParams } from "@/actions/getRoute";
-import type { RouteData } from "@/types/types";
+
 import polyline from "@mapbox/polyline";
 
 export interface RouteParams {
@@ -24,6 +22,7 @@ async function fetchRouteAPI(params: RouteParams) {
     });
 
     if (!res.ok) {
+      console.error("Failed to fetch route:", res.statusText);
       throw new Error("Failed to fetch route");
     }
 

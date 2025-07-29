@@ -172,7 +172,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
           icon={station.side === "derecho" ? rightSideIcon : leftSideIcon}
           eventHandlers={{
             click: () => {
-              console.log("Marker clicked:", station.location_id);
               setSelectedPOI(station.id);
             }
           }}

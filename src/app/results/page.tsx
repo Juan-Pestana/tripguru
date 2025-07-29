@@ -89,7 +89,6 @@ export default function Search() {
     },
     !!route // enabled only if route exists
   );
-  console.log("Filtered POIs:", filteredPois);
 
   return (
     <div className="flex flex-col md:flex-row h-screen">

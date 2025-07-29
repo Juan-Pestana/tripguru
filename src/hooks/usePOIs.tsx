@@ -25,7 +25,7 @@ export async function fetchPOIs(
   options: FetchPOIsOptions
 ): Promise<POI[]> {
   const { selectedTypes, fuelType, connectionType, radius = 200 } = options;
-  console.log(selectedTypes);
+
   const body = {
     routeCoordinates,
     fuel_type: selectedTypes.has("service_station") ? fuelType : undefined,

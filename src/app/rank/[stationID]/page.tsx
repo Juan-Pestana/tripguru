@@ -122,7 +122,6 @@ function RankPage({ params }: { params: Promise<{ stationID: string }> }) {
   };
 
   const handleCategorySelect = (categoryId: string) => {
-    console.log(categoryId);
     if (primaryCategory === categoryId) {
       setPrimaryCategory("");
     } else if (secondaryCategory === categoryId) {

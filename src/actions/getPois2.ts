@@ -143,8 +143,6 @@ export async function getEVChargingPoints(
             ORDER BY distance_along_route ASC;
           `);
 
-  console.log("EV Charging Points:", pois.rows);
-
   return pois.rows.map(
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (poi: any) => ({
@@ -251,8 +249,6 @@ export async function getAllPOIs(
       SELECT * FROM ev_points
       ORDER BY distance_along_route ASC;
     `);
-
-  console.log("All POIs:", pois);
 
   return pois.rows.map(
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
